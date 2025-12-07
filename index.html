@@ -76,7 +76,6 @@
     }
 </style>
 
-<script src="excel.js"></script>
 </head>
 
 <body>
@@ -84,6 +83,9 @@
 <h2>Kasir Mobile</h2>
 
 <div class="card">
+    <!-- ✨ FORM UPLOAD FILE EXCEL -->
+    <input type="file" id="uploadExcel" accept=".xlsx" onchange="uploadExcel()">
+
     <input id="search" placeholder="Cari nama / barcode..." oninput="cariBarang()">
 
     <select id="listBarang"></select>
@@ -107,11 +109,26 @@
 let database = [];
 let keranjang = [];
 
-// === MUAT DATA EXCEL ===
-readExcel("data.xlsx", function(data) {
-    database = data;
-    renderSelect();
-});
+// === UPLOAD FILE EXCEL ===
+function uploadExcel() {
+    let file = document.getElementById("uploadExcel").files[0];
+    if (!file) return;
+
+    let reader = new FileReader();
+    reader.onload = function(e) {
+        let data = new Uint8Array(e.target.result);
+        let workbook = XLSX.read(data, { type: "array" });
+        let sheet = workbook.Sheets[workbook.SheetNames[0]];
+
+        // Convert sheet to JSON
+        database = XLSX.utils.sheet_to_json(sheet);
+
+        renderSelect();
+        alert("Data Excel berhasil dimuat!");
+    };
+
+    reader.readAsArrayBuffer(file);
+}
 
 // === RENDER SELECT BARANG ===
 function renderSelect() {
@@ -170,7 +187,7 @@ function renderKeranjang() {
     document.getElementById("total").innerText = "Rp " + total.toLocaleString();
 }
 
-// === CETAK (kirim ke struk.html) ===
+// === CETAK STRUK ===
 function cetakStruk() {
     localStorage.setItem("strukData", JSON.stringify(keranjang));
     window.location.href = "struk.html";
