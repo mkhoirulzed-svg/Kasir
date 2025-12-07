@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Struk</title>
+
+<style>
+    body { margin:0; padding:0; background:#fff; }
+    .receipt {
+        width: 58mm;
+        padding: 10px;
+        margin: auto;
+        font-family: monospace;
+        font-size: 12px;
+    }
+    .center { text-align:center; }
+    .divider { border-top:1px dashed #000; margin:6px 0; }
+    .right { text-align:right; }
+</style>
+
+<script src="funprint.js"></script>
+</head>
+
+<body>
+
+<div class="receipt" id="strukArea">
+    <div class="center">
+        <img src="assets/logo.png" width="100"><br>
+        <strong>TOKO KH</strong><br>
+        Jl. Contoh<br>
+    </div>
+
+    <div class="divider"></div>
+
+    <div id="itemList"></div>
+
+    <div class="divider"></div>
+
+    Total: <span id="total" class="right"></span>
+
+    <div class="divider"></div>
+
+    <div class="center">Terima kasih!</div>
+</div>
+
+<script>
+// ========================
+// LOAD DATA
+// ========================
+let data = JSON.parse(localStorage.getItem("strukData") || "[]");
+
+let html = "";
+let total = 0;
+
+data.forEach(b => {
+    let sub = b.qty * b.harga;
+    total += sub;
+
+    html += `
+        ${b.nama}<br>
+        ${b.qty} x ${b.harga.toLocaleString()}  
+        <span style="float:right">${sub.toLocaleString()}</span><br>
+    `;
+});
+
+document.getElementById("itemList").innerHTML = html;
+document.getElementById("total").innerText = "Rp " + total.toLocaleString();
+
+// ========================
+// CETAK VIA FUNPRINT
+// ========================
+setTimeout(() => {
+    let content = document.getElementById("strukArea").innerText;
+    sendToFunPrint(content);
+}, 800);
+</script>
+
+</body>
+</html>
