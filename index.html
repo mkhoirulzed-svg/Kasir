@@ -171,10 +171,33 @@ function renderKeranjang() {
 }
 
 // === CETAK (kirim ke struk.html) ===
-function cetakStruk() {
+    async function updateStokKeSheets(item) {
+    return fetch("https://script.google.com/macros/s/AKfycbwJM4vHIfuMNS8iURwWSC1zODcI1bjytTPD2LovUl_FWe4FmNtgM-4PC7F0jNnTUxopIg/exec", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        sheet: "Stok_Toko_Alkes",
+        barang: item.nama,
+        qty: item.qty
+      })
+    })
+    .then(res => res.json())
+    .catch(err => ({ status: "ERROR", message: err }));
+}
+
+async function cetakStruk() {
+
+    // === Update stok satu per satu ===
+    for (let item of keranjang) {
+        let res = await updateStokKeSheets(item);
+        console.log("Update stok:", item.nama, res);
+    }
+
+    // === Simpan struk dan lanjut ke halaman struk ===
     localStorage.setItem("strukData", JSON.stringify(keranjang));
     window.location.href = "struk.html";
 }
+
 </script>
 <script src="excel.js"></script>
 <script src="funprint.js"></script>
