@@ -96,7 +96,7 @@
 </div>
 
 <script>
-const API_URL = "PASTE_URL_APPS_SCRIPT_MU_DI_SINI"; // GANTI INI
+const API_URL = "https://script.google.com/macros/s/AKfycbxPfx2e43F1sCjH-CUOHwdr7KYulnnCCp5l5fz3SWBiIa27EaYzG4n6ltIKv-921xjPLg/exec"; // GANTI INI
 
 let database = [];
 let keranjang = [];
@@ -233,4 +233,20 @@ async function checkout() {
 
     // 1. Update stok di spreadsheet
     for (let item of keranjang) {
-        await fetch(API_URL + "?action=update&ko_
+        await fetch(API_URL + "?action=update&kode=" + item.kode + "&qty=" + item.qty);
+    }
+
+    // 2. Print Struk
+    printStruk();
+
+    // 3. Reset keranjang
+    keranjang = [];
+    renderKeranjang();
+
+    // 4. Refresh stok realtime
+    loadData();
+}
+</script>
+
+</body>
+</html>
