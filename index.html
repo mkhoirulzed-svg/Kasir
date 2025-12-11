@@ -4,7 +4,11 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Kasir Mobile</title>
+
+<!-- XLSX Loader -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+
+<!-- Fonts -->
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600&display=swap">
 
 <style>
@@ -104,16 +108,23 @@
 </div>
 
 <script>
+// =========================
+// VARIABEL GLOBAL
+// =========================
 let database = [];
 let keranjang = [];
 
-// === MUAT DATA EXCEL ===
+// =========================
+// 1. MUAT DATA EXCEL
+// =========================
 readExcel("data.xlsx", function(data) {
     database = data;
     renderSelect();
 });
 
-// === RENDER SELECT BARANG ===
+// =========================
+// 2. TAMPILKAN DATA KE SELECT BOX
+// =========================
 function renderSelect() {
     let html = "";
     database.forEach(b => {
@@ -122,7 +133,9 @@ function renderSelect() {
     document.getElementById("listBarang").innerHTML = html;
 }
 
-// === SEARCH ===
+// =========================
+// 3. PENCARIAN BARANG
+// =========================
 function cariBarang() {
     let q = document.getElementById("search").value.toLowerCase();
     let hasil = database.filter(b => 
@@ -138,7 +151,9 @@ function cariBarang() {
     document.getElementById("listBarang").innerHTML = html;
 }
 
-// === TAMBAH KE KERANJANG ===
+// =========================
+// 4. TAMBAH KE KERANJANG
+// =========================
 function tambah() {
     let select = document.getElementById("listBarang");
     let nama = select.value;
@@ -149,7 +164,9 @@ function tambah() {
     renderKeranjang();
 }
 
-// === RENDER KERANJANG ===
+// =========================
+// 5. TAMPILKAN KERANJANG
+// =========================
 function renderKeranjang() {
     let html = "";
     let total = 0;
@@ -170,8 +187,10 @@ function renderKeranjang() {
     document.getElementById("total").innerText = "Rp " + total.toLocaleString();
 }
 
-// === CETAK (kirim ke struk.html) ===
-    async function updateStokKeSheets(item) {
+// =========================
+// 6. UPDATE STOK GOOGLE SHEETS
+// =========================
+async function updateStokKeSheets(item) {
     return fetch("https://script.google.com/macros/s/AKfycbwJM4vHIfuMNS8iURwWSC1zODcI1bjytTPD2LovUl_FWe4FmNtgM-4PC7F0jNnTUxopIg/exec", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
@@ -185,21 +204,26 @@ function renderKeranjang() {
     .catch(err => ({ status: "ERROR", message: err }));
 }
 
+// =========================
+// 7. CETAK + UPDATE STOK
+// =========================
 async function cetakStruk() {
 
-    // === Update stok satu per satu ===
+    // --- Update stok satu per satu ---
     for (let item of keranjang) {
         let res = await updateStokKeSheets(item);
         console.log("Update stok:", item.nama, res);
     }
 
-    // === Simpan struk dan lanjut ke halaman struk ===
+    // --- Simpan struk ---
     localStorage.setItem("strukData", JSON.stringify(keranjang));
+
+    // --- Pindah ke halaman struk ---
     window.location.href = "struk.html";
 }
-
 </script>
-<script src="excel.js"></script>
+
 <script src="funprint.js"></script>
+
 </body>
 </html>
