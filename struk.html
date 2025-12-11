@@ -7,20 +7,50 @@
 <title>Struk</title>
 
 <style>
-    body { margin:0; padding:0; background:#fff; }
-    .receipt {
-        width: 58mm;
-        padding: 12px;
-        margin: auto;
+    body {
+        margin: 0;
+        padding: 0;
+        background: #fff;
         font-family: monospace;
-        font-size: 14px; /* === LEBIH BESAR === */
-        line-height: 1.4;
     }
-    .center { text-align:center; }
-    .divider { border-top:1px dashed #000; margin:8px 0; }
-    .right { float:right; }
+
+    /* Lebar FIX 384px agar tidak berubah di Funprint */
+    .receipt {
+        width: 384px;
+        max-width: 384px;
+        padding: 4px;
+        margin: 0 auto;
+        font-size: 16px;
+        line-height: 1.35;
+    }
+
+    .center { text-align: center; }
+
+    .divider {
+        border-top: 1px dashed #000;
+        margin: 8px 0;
+    }
+
+    /* Baris item stabil */
+    .row {
+        display: flex;
+        justify-content: space-between;
+        width: 100%;
+    }
+
+    .item-name {
+        font-weight: bold;
+        max-width: 240px; /* cegah nama terlalu panjang melebar */
+        word-wrap: break-word;
+    }
+
+    .item-sub {
+        text-align: right;
+        min-width: 120px;
+    }
+
     .title {
-        font-size: 16px;     /* === JUDUL LEBIH BESAR === */
+        font-size: 20px;
         font-weight: bold;
     }
 </style>
@@ -29,8 +59,9 @@
 <body>
 
 <div class="receipt" id="strukArea">
+
     <div class="center">
-        <img src="logo.png" style="width:60px; height:60px;"><br>
+        <img src="logo.png" style="width:70px; height:70px;"><br>
         <div class="title">Alkes PKY</div>
     </div>
 
@@ -40,14 +71,18 @@
 
     <div class="divider"></div>
 
-    <strong>Total:</strong> <span id="total"></span>
+    <div class="row" style="font-size:18px; font-weight:bold;">
+        <span>Total:</span>
+        <span id="total"></span>
+    </div>
 
     <div class="divider"></div>
 
-    <div class="center" style="font-size:15px;">
+    <div class="center" style="font-size:17px;">
         Terima kasih!<br>
         Sehat selalu<br>
     </div>
+
 </div>
 
 <script>
@@ -64,15 +99,17 @@ data.forEach(b => {
     total += sub;
 
     html += `
-        <strong>${b.nama}</strong><br>
-        ${b.qty} x ${b.harga.toLocaleString()}  
-        <span class="right">${sub.toLocaleString()}</span><br><br>
+        <div class="item-name">${b.nama}</div>
+        <div class="row">
+            <span>${b.qty} x ${b.harga.toLocaleString()}</span>
+            <span class="item-sub">${sub.toLocaleString()}</span>
+        </div>
+        <br>
     `;
 });
 
 document.getElementById("itemList").innerHTML = html;
 document.getElementById("total").innerText = "Rp " + total.toLocaleString();
-
 </script>
 
 </body>
