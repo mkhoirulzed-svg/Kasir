@@ -10,14 +10,19 @@
     body { margin:0; padding:0; background:#fff; }
     .receipt {
         width: 58mm;
-        padding: 10px;
+        padding: 12px;
         margin: auto;
         font-family: monospace;
-        font-size: 12px;
+        font-size: 14px; /* === LEBIH BESAR === */
+        line-height: 1.4;
     }
     .center { text-align:center; }
-    .divider { border-top:1px dashed #000; margin:6px 0; }
+    .divider { border-top:1px dashed #000; margin:8px 0; }
     .right { float:right; }
+    .title {
+        font-size: 16px;     /* === JUDUL LEBIH BESAR === */
+        font-weight: bold;
+    }
 </style>
 
 </head>
@@ -25,8 +30,8 @@
 
 <div class="receipt" id="strukArea">
     <div class="center">
-        <img src="logo.png" style="width:50px; height:50px;"><br>
-        <strong>Alkes PKY</strong><br>
+        <img src="logo.png" style="width:60px; height:60px;"><br>
+        <div class="title">Alkes PKY</div>
     </div>
 
     <div class="divider"></div>
@@ -35,11 +40,14 @@
 
     <div class="divider"></div>
 
-    Total: <span id="total"></span>
+    <strong>Total:</strong> <span id="total"></span>
 
     <div class="divider"></div>
 
-    <div class="center">Terima kasih!<br>Sehat selalu<br></div>
+    <div class="center" style="font-size:15px;">
+        Terima kasih!<br>
+        Sehat selalu<br>
+    </div>
 </div>
 
 <script>
@@ -56,7 +64,7 @@ data.forEach(b => {
     total += sub;
 
     html += `
-        ${b.nama}<br>
+        <strong>${b.nama}</strong><br>
         ${b.qty} x ${b.harga.toLocaleString()}  
         <span class="right">${sub.toLocaleString()}</span><br><br>
     `;
@@ -65,11 +73,6 @@ data.forEach(b => {
 document.getElementById("itemList").innerHTML = html;
 document.getElementById("total").innerText = "Rp " + total.toLocaleString();
 
-// ========================
-// TANPA FUNPRINT (NO PRINT)
-// ========================
-// jika ingin auto print browser: window.print();
-// jika ingin kirim WA dari sini, bisa saya tambahkan.
 </script>
 
 </body>
