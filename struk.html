@@ -8,23 +8,20 @@
 
 <style>
     body { margin:0; padding:0; background:#fff; }
-
     .receipt {
-        width: 58mm;
-        padding: 4px;              /* --- Margin rapat --- */
+        width: 40mm;
+        padding: 12px;
         margin: auto;
         font-family: monospace;
-        font-size: 16px;           /* --- Tulisan lebih besar --- */
+        font-size: 14px; /* === LEBIH BESAR === */
         line-height: 1.4;
     }
-
     .center { text-align:center; }
     .divider { border-top:1px dashed #000; margin:8px 0; }
     .right { float:right; }
-
     .title {
-        font-size: 20px;           /* --- Judul lebih besar --- */
-        font-weight:bold;
+        font-size: 16px;     /* === JUDUL LEBIH BESAR === */
+        font-weight: bold;
     }
 </style>
 
@@ -33,7 +30,7 @@
 
 <div class="receipt" id="strukArea">
     <div class="center">
-        <img src="logo.png" style="width:65px; height:65px;"><br>
+        <img src="logo.png" style="width:60px; height:60px;"><br>
         <div class="title">Alkes PKY</div>
     </div>
 
@@ -43,11 +40,11 @@
 
     <div class="divider"></div>
 
-    <strong>Total: </strong><span id="total"></span>
+    <strong>Total:</strong> <span id="total"></span>
 
     <div class="divider"></div>
 
-    <div class="center" style="font-size:17px;">
+    <div class="center" style="font-size:15px;">
         Terima kasih!<br>
         Sehat selalu<br>
     </div>
@@ -75,6 +72,7 @@ data.forEach(b => {
 
 document.getElementById("itemList").innerHTML = html;
 document.getElementById("total").innerText = "Rp " + total.toLocaleString();
+
 </script>
 
 </body>
