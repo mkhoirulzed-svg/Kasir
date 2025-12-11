@@ -1,6 +1,22 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
+<!-- Favicon Standar -->
+<link rel="icon" type="image/png" href="logo.png">
+
+<!-- iPhone / iPad PWA Icon -->
+<link rel="apple-touch-icon" href="logo.png">
+
+<!-- Android & PWA Manifest -->
+<link rel="manifest" href="manifest.json">
+
+<!-- Warna address bar Android -->
+<meta name="theme-color" content="#1a56db">
+
+<!-- Fullscreen mode iOS -->
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Kasir Alkes PKY</title>
@@ -211,5 +227,11 @@ function kirimWA() {
 </script>
 
 <script src="funprint.js"></script>
+<script>
+if ("serviceWorker" in navigator) {
+    navigator.serviceWorker.register("sw.js");
+}
+</script>
+
 </body>
 </html>
