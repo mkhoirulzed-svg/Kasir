@@ -2,198 +2,181 @@
 <html lang="id">
 <head>
 <meta charset="UTF-8">
-<title>Kasir Alkes</title>
-<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Kasir Mobile</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600&display=swap">
 
 <style>
-    body { font-family: Arial, sans-serif; padding: 15px; }
-    .box { border: 1px solid #ccc; padding: 10px; margin-bottom: 15px; border-radius: 5px; }
-    button { padding: 8px 12px; margin-top: 10px; cursor: pointer; }
-    #keranjangTable td { padding: 4px 6px; }
+    body {
+        margin: 0;
+        font-family: 'Inter', sans-serif;
+        background: #e9f2ff;
+        padding: 15px;
+    }
+
+    h2 {
+        color: #1a56db;
+        text-align: center;
+        margin-bottom: 10px;
+    }
+
+    .card {
+        background: #fff;
+        padding: 15px;
+        border-radius: 12px;
+        box-shadow: 0 3px 10px rgba(0,0,0,0.1);
+        margin-bottom: 20px;
+    }
+
+    input, select {
+        width: 100%;
+        padding: 12px;
+        margin: 8px 0;
+        border: 1px solid #ccc;
+        border-radius: 8px;
+        font-size: 16px;
+    }
+
+    .btn {
+        display: block;
+        width: 100%;
+        padding: 14px;
+        border: none;
+        border-radius: 8px;
+        font-size: 18px;
+        font-weight: bold;
+        cursor: pointer;
+        margin-top: 10px;
+        background: #1a56db;
+        color: #fff;
+    }
+
+    table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-top: 15px;
+        font-size: 16px;
+    }
+
+    td {
+        padding: 6px 0;
+    }
+
+    .right {
+        text-align: right;
+    }
+
+    .total-box {
+        font-size: 20px;
+        font-weight: bold;
+        margin-top: 10px;
+        text-align: right;
+        color: #1a56db;
+    }
 </style>
+
+<script src="excel.js"></script>
 </head>
 
 <body>
 
-<h2>🛒 Kasir Alkes – Realtime Stok</h2>
+<h2>Kasir Mobile</h2>
+
+<div class="card">
+    <input id="search" placeholder="Cari nama / barcode..." oninput="cariBarang()">
+
+    <select id="listBarang"></select>
+
+    <input id="qty" type="number" placeholder="Qty" value="1">
+
+    <button class="btn" onclick="tambah()">Tambah ke Keranjang</button>
+</div>
+
+<div class="card">
+    <h3>Keranjang</h3>
+    <table id="keranjangList"></table>
+    <div class="total-box">
+        Total: <span id="total">Rp 0</span>
+    </div>
+
+    <button class="btn" onclick="cetakStruk()">🧾 Cetak dengan FunPrint</button>
+</div>
 
 <script>
-const API_URL = "PASTE_URL_WEBAPP_MU_DI_SINI"; // <--- GANTI INI
-
 let database = [];
 let keranjang = [];
 
-// =======================================================
-// 1. LOAD DATA dari Google Sheets (GET)
-// =======================================================
-async function loadData() {
-    try {
-        const res = await fetch(API_URL + "?action=getItems");
-        database = await res.json();
-        renderSelect();
-    } catch (e) {
-        alert("Gagal memuat data dari server.");
-        console.log(e);
-    }
-}
+// === MUAT DATA EXCEL ===
+readExcel("data.xlsx", function(data) {
+    database = data;
+    renderSelect();
+});
 
-// =======================================================
-// 2. Tampilkan pilihan produk + stok realtime
-// =======================================================
+// === RENDER SELECT BARANG ===
 function renderSelect() {
-    const select = document.getElementById("produk");
-    select.innerHTML = "";
-
-    database.forEach(item => {
-        const opt = document.createElement("option");
-        opt.value = item.kode;
-        opt.textContent = `${item.nama} — Rp${item.harga} — Stok: ${item.stok}`;
-        select.appendChild(opt);
+    let html = "";
+    database.forEach(b => {
+        html += `<option value="${b.nama}" data-harga="${b.harga}">${b.nama} - Rp ${b.harga.toLocaleString()}</option>`;
     });
+    document.getElementById("listBarang").innerHTML = html;
 }
 
-// =======================================================
-// 3. Tambahkan ke keranjang
-// =======================================================
-function tambahKeranjang() {
-    const kode = document.getElementById("produk").value;
-    const qty = parseInt(document.getElementById("qty").value);
+// === SEARCH ===
+function cariBarang() {
+    let q = document.getElementById("search").value.toLowerCase();
+    let hasil = database.filter(b => 
+        b.nama.toLowerCase().includes(q) ||
+        (b.kode && b.kode.toString().includes(q))
+    );
 
-    if (!kode || qty <= 0) {
-        alert("Isi jumlah dengan benar.");
-        return;
-    }
-
-    const item = database.find(i => i.kode === kode);
-    if (!item) return;
-
-    if (qty > item.stok) {
-        alert("Stok tidak cukup.");
-        return;
-    }
-
-    keranjang.push({
-        nama: item.nama,
-        kode: item.kode,
-        harga: item.harga,
-        qty: qty,
-        total: qty * item.harga
+    let html = "";
+    hasil.forEach(b => {
+        html += `<option value="${b.nama}" data-harga="${b.harga}">${b.nama} - Rp ${b.harga.toLocaleString()}</option>`;
     });
 
+    document.getElementById("listBarang").innerHTML = html;
+}
+
+// === TAMBAH KE KERANJANG ===
+function tambah() {
+    let select = document.getElementById("listBarang");
+    let nama = select.value;
+    let harga = Number(select.selectedOptions[0].dataset.harga);
+    let qty = Number(document.getElementById("qty").value);
+
+    keranjang.push({nama, qty, harga});
     renderKeranjang();
 }
 
-// =======================================================
-// 4. Render tabel keranjang
-// =======================================================
+// === RENDER KERANJANG ===
 function renderKeranjang() {
-    const tbody = document.getElementById("keranjangBody");
-    tbody.innerHTML = "";
+    let html = "";
+    let total = 0;
 
-    keranjang.forEach((item, i) => {
-        tbody.innerHTML += `
+    keranjang.forEach(b => {
+        let sub = b.qty * b.harga;
+        total += sub;
+
+        html += `
             <tr>
-                <td>${item.nama}</td>
-                <td>${item.qty}</td>
-                <td>Rp${item.harga}</td>
-                <td>Rp${item.total}</td>
-                <td><button onclick="hapus(${i})">❌</button></td>
-            </tr>`;
-    });
-}
-
-function hapus(i) {
-    keranjang.splice(i, 1);
-    renderKeranjang();
-}
-
-// =======================================================
-// 5. Print Struk
-// =======================================================
-function printStruk() {
-    let struk = "=== STRUK PEMBELIAN ===\n\n";
-
-    let grand = 0;
-    keranjang.forEach(i => {
-        struk += `${i.nama} x ${i.qty} = Rp${i.total}\n`;
-        grand += i.total;
+                <td>${b.qty}x ${b.nama}</td>
+                <td class="right">Rp ${sub.toLocaleString()}</td>
+            </tr>
+        `;
     });
 
-    struk += `\nTOTAL: Rp${grand}\n`;
-    struk += "\nTerima kasih telah berbelanja.";
-
-    let w = window.open("", "_blank");
-    w.document.write(`<pre>${struk}</pre>`);
-    w.print();
-    w.close();
+    document.getElementById("keranjangList").innerHTML = html;
+    document.getElementById("total").innerText = "Rp " + total.toLocaleString();
 }
 
-// =======================================================
-// 6. Checkout → update stok di Google Sheets
-// =======================================================
-async function checkout() {
-    if (keranjang.length === 0) {
-        alert("Keranjang kosong.");
-        return;
-    }
-
-    try {
-        await fetch(API_URL, {
-            method: "POST",
-            headers: {"Content-Type": "application/json"},
-            body: JSON.stringify({
-                action: "sell",
-                data: keranjang.map(it => ({
-                    nama: it.nama,
-                    kode: it.kode,
-                    qty: it.qty
-                }))
-            })
-        });
-
-        printStruk();
-
-        keranjang = [];
-        renderKeranjang();
-        loadData();
-
-        alert("Transaksi berhasil disimpan.");
-    } catch (e) {
-        alert("Gagal checkout.");
-        console.log(e);
-    }
+// === CETAK (kirim ke struk.html) ===
+function cetakStruk() {
+    localStorage.setItem("strukData", JSON.stringify(keranjang));
+    window.location.href = "struk.html";
 }
-
-window.onload = loadData;
 </script>
-
-<!-- ====================== UI ====================== -->
-
-<div class="box">
-    <h3>Pilih Produk</h3>
-    <select id="produk" style="width: 100%; padding: 8px;"></select>
-
-    <input id="qty" type="number" min="1" value="1"
-           style="width: 100%; padding: 8px; margin-top: 10px;">
-
-    <button onclick="tambahKeranjang()" style="width:100%; background: #28a745; color:white;">
-        ➕ Tambahkan
-    </button>
-</div>
-
-<div class="box">
-    <h3>Keranjang</h3>
-    <table width="100%" border="1" style="border-collapse: collapse;">
-        <thead>
-            <tr><th>Item</th><th>Qty</th><th>Harga</th><th>Total</th><th></th></tr>
-        </thead>
-        <tbody id="keranjangBody"></tbody>
-    </table>
-
-    <button onclick="checkout()" style="width:100%; background:#007bff; color:white;">
-        💳 Checkout
-    </button>
-</div>
-
+<script src="excel.js"></script>
+<script src="funprint.js"></script>
 </body>
 </html>
