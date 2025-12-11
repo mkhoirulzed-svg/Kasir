@@ -1,182 +1,160 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Kasir Mobile</title>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600&display=swap">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Kasir Toko Alkes</title>
 
-<style>
-    body {
-        margin: 0;
-        font-family: 'Inter', sans-serif;
-        background: #e9f2ff;
-        padding: 15px;
-    }
+  <script src="https://cdn.tailwindcss.com"></script>
 
-    h2 {
-        color: #1a56db;
-        text-align: center;
-        margin-bottom: 10px;
-    }
-
-    .card {
-        background: #fff;
-        padding: 15px;
-        border-radius: 12px;
-        box-shadow: 0 3px 10px rgba(0,0,0,0.1);
-        margin-bottom: 20px;
-    }
-
-    input, select {
-        width: 100%;
-        padding: 12px;
-        margin: 8px 0;
-        border: 1px solid #ccc;
-        border-radius: 8px;
-        font-size: 16px;
-    }
-
-    .btn {
-        display: block;
-        width: 100%;
-        padding: 14px;
-        border: none;
-        border-radius: 8px;
-        font-size: 18px;
-        font-weight: bold;
-        cursor: pointer;
-        margin-top: 10px;
-        background: #1a56db;
-        color: #fff;
-    }
-
-    table {
-        width: 100%;
-        border-collapse: collapse;
-        margin-top: 15px;
-        font-size: 16px;
-    }
-
-    td {
-        padding: 6px 0;
-    }
-
-    .right {
-        text-align: right;
-    }
-
-    .total-box {
-        font-size: 20px;
-        font-weight: bold;
-        margin-top: 10px;
-        text-align: right;
-        color: #1a56db;
-    }
-</style>
-
-<script src="excel.js"></script>
+  <style>
+    body { background: #f6f6f6; }
+  </style>
 </head>
 
-<body>
+<body class="p-6">
 
-<h2>Kasir Mobile</h2>
+  <h1 class="text-2xl font-bold mb-4">KASIR TOKO ALKES</h1>
 
-<div class="card">
-    <input id="search" placeholder="Cari nama / barcode..." oninput="cariBarang()">
+  <!-- INPUT FORM -->
+  <div class="bg-white p-4 shadow rounded-lg mb-6">
+    <label class="block mb-2 font-semibold">Nama Barang</label>
+    <input id="namaBarang" class="border rounded w-full p-2 mb-3" placeholder="contoh: Spuit 3 ml" />
 
-    <select id="listBarang"></select>
+    <label class="block mb-2 font-semibold">Harga</label>
+    <input id="harga" type="number" class="border rounded w-full p-2 mb-3" placeholder="contoh: 1500" />
 
-    <input id="qty" type="number" placeholder="Qty" value="1">
+    <label class="block mb-2 font-semibold">Qty</label>
+    <input id="qty" type="number" class="border rounded w-full p-2 mb-3" placeholder="contoh: 2" />
 
-    <button class="btn" onclick="tambah()">Tambah ke Keranjang</button>
-</div>
+    <button onclick="tambahItem()" class="bg-blue-600 text-white px-4 py-2 rounded">
+      Tambah ke Struk
+    </button>
+  </div>
 
-<div class="card">
-    <h3>Keranjang</h3>
-    <table id="keranjangList"></table>
-    <div class="total-box">
-        Total: <span id="total">Rp 0</span>
-    </div>
+  <!-- TABEL PESANAN -->
+  <div class="bg-white p-4 shadow rounded-lg mb-6">
+    <h2 class="text-xl font-bold mb-3">Daftar Belanja</h2>
 
-    <button class="btn" onclick="cetakStruk()">🧾 Cetak dengan FunPrint</button>
-</div>
+    <table class="w-full border">
+      <thead>
+        <tr class="bg-gray-200">
+          <th class="border p-2">Barang</th>
+          <th class="border p-2">Harga</th>
+          <th class="border p-2">Qty</th>
+          <th class="border p-2">Subtotal</th>
+        </tr>
+      </thead>
+      <tbody id="daftarBelanja"></tbody>
+    </table>
+
+    <h3 class="text-right text-xl font-bold mt-4">Total: Rp <span id="totalHarga">0</span></h3>
+
+    <button onclick="simpanTransaksi()" class="bg-green-600 text-white w-full py-3 rounded mt-4">
+      Simpan Transaksi + Update Stok
+    </button>
+  </div>
+
+  <!-- STRUK -->
+  <div class="bg-white p-4 shadow rounded-lg" id="struk" style="display:none;">
+    <h2 class="text-xl font-bold mb-3">Struk Transaksi</h2>
+    <div id="strukIsi"></div>
+  </div>
+
 
 <script>
-let database = [];
-let keranjang = [];
+  let items = [];
 
-// === MUAT DATA EXCEL ===
-readExcel("data.xlsx", function(data) {
-    database = data;
-    renderSelect();
-});
+  function tambahItem() {
+    const nama = document.getElementById("namaBarang").value.trim();
+    const harga = parseInt(document.getElementById("harga").value);
+    const qty = parseInt(document.getElementById("qty").value);
 
-// === RENDER SELECT BARANG ===
-function renderSelect() {
-    let html = "";
-    database.forEach(b => {
-        html += `<option value="${b.nama}" data-harga="${b.harga}">${b.nama} - Rp ${b.harga.toLocaleString()}</option>`;
-    });
-    document.getElementById("listBarang").innerHTML = html;
-}
+    if (!nama || !harga || !qty) {
+      alert("Semua input harus diisi!");
+      return;
+    }
 
-// === SEARCH ===
-function cariBarang() {
-    let q = document.getElementById("search").value.toLowerCase();
-    let hasil = database.filter(b => 
-        b.nama.toLowerCase().includes(q) ||
-        (b.kode && b.kode.toString().includes(q))
-    );
+    items.push({ nama, harga, qty });
 
-    let html = "";
-    hasil.forEach(b => {
-        html += `<option value="${b.nama}" data-harga="${b.harga}">${b.nama} - Rp ${b.harga.toLocaleString()}</option>`;
-    });
+    renderTabel();
+  }
 
-    document.getElementById("listBarang").innerHTML = html;
-}
+  function renderTabel() {
+    const tbody = document.getElementById("daftarBelanja");
+    tbody.innerHTML = "";
 
-// === TAMBAH KE KERANJANG ===
-function tambah() {
-    let select = document.getElementById("listBarang");
-    let nama = select.value;
-    let harga = Number(select.selectedOptions[0].dataset.harga);
-    let qty = Number(document.getElementById("qty").value);
-
-    keranjang.push({nama, qty, harga});
-    renderKeranjang();
-}
-
-// === RENDER KERANJANG ===
-function renderKeranjang() {
-    let html = "";
     let total = 0;
 
-    keranjang.forEach(b => {
-        let sub = b.qty * b.harga;
-        total += sub;
+    items.forEach((item, i) => {
+      total += item.harga * item.qty;
 
-        html += `
-            <tr>
-                <td>${b.qty}x ${b.nama}</td>
-                <td class="right">Rp ${sub.toLocaleString()}</td>
-            </tr>
-        `;
+      tbody.innerHTML += `
+        <tr>
+          <td class="border p-2">${item.nama}</td>
+          <td class="border p-2">Rp ${item.harga}</td>
+          <td class="border p-2">${item.qty}</td>
+          <td class="border p-2">Rp ${item.harga * item.qty}</td>
+        </tr>
+      `;
     });
 
-    document.getElementById("keranjangList").innerHTML = html;
-    document.getElementById("total").innerText = "Rp " + total.toLocaleString();
-}
+    document.getElementById("totalHarga").innerText = total;
+  }
 
-// === CETAK (kirim ke struk.html) ===
-function cetakStruk() {
-    localStorage.setItem("strukData", JSON.stringify(keranjang));
-    window.location.href = "struk.html";
-}
+  // =====================
+  //  UPDATE STOK GOOGLE SHEETS
+  // =====================
+  async function updateStokKeSheets(item) {
+    return fetch("https://script.google.com/macros/s/AKfycbwJM4vHIfuMNS8iURwWSC1zODcI1bjytTPD2LovUl_FWe4FmNtgM-4PC7F0jNnTUxopIg/exec", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        sheet: "Stok_Toko_Alkes",
+        barang: item.nama,
+        qty: item.qty
+      })
+    })
+    .then(res => res.json())
+    .catch(err => ({ status: "ERROR", message: err }));
+  }
+
+  // =====================
+  //  SIMPAN TRANSAKSI
+  // =====================
+  async function simpanTransaksi() {
+    if (items.length === 0) {
+      alert("Belum ada item!");
+      return;
+    }
+
+    // Update stok untuk setiap item (LOGIKA B)
+    for (let item of items) {
+      let res = await updateStokKeSheets(item);
+      console.log("Update stok:", item.nama, res);
+    }
+
+    // Tampilkan struk
+    tampilkanStruk();
+
+    alert("Transaksi disimpan & stok sudah diperbarui!");
+    items = [];
+    renderTabel();
+  }
+
+  function tampilkanStruk() {
+    const div = document.getElementById("strukIsi");
+    div.innerHTML = "";
+
+    items.forEach(item => {
+      div.innerHTML += `
+        <p>${item.nama} (${item.qty} x Rp ${item.harga}) = Rp ${item.harga * item.qty}</p>
+      `;
+    });
+
+    document.getElementById("struk").style.display = "block";
+  }
 </script>
-<script src="excel.js"></script>
-<script src="funprint.js"></script>
+
 </body>
 </html>
