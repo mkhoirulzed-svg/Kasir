@@ -1,234 +1,240 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
-<!-- Favicon Standar -->
+<!-- ===== PWA & ICON ===== -->
 <link rel="icon" type="image/png" href="logo.png">
-
-<!-- iPhone / iPad PWA Icon -->
 <link rel="apple-touch-icon" href="logo.png">
-
-<!-- Android & PWA Manifest -->
 <link rel="manifest" href="manifest.json">
-
-<!-- Warna address bar Android -->
 <meta name="theme-color" content="#1a56db">
-
-<!-- Fullscreen mode iOS -->
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
 
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Kasir Alkes PKY</title>
+
+<!-- ===== LIBRARY ===== -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600&display=swap">
 
 <style>
-    body {
-        margin: 0;
-        font-family: 'Inter', sans-serif;
-        background: #e9f2ff;
-        padding: 15px;
-    }
-
-    h2 {
-        color: #1a56db;
-        text-align: center;
-        margin-bottom: 10px;
-    }
-
-    .card {
-        background: #fff;
-        padding: 15px;
-        border-radius: 12px;
-        box-shadow: 0 3px 10px rgba(0,0,0,0.1);
-        margin-bottom: 20px;
-    }
-
-    input, select {
-        width: 100%;
-        padding: 12px;
-        margin: 8px 0;
-        border: 1px solid #ccc;
-        border-radius: 8px;
-        font-size: 16px;
-    }
-
-    .btn {
-        display: block;
-        width: 100%;
-        padding: 14px;
-        border: none;
-        border-radius: 8px;
-        font-size: 18px;
-        font-weight: bold;
-        cursor: pointer;
-        margin-top: 10px;
-        background: #1a56db;
-        color: #fff;
-    }
-
-    table {
-        width: 100%;
-        border-collapse: collapse;
-        margin-top: 15px;
-        font-size: 16px;
-    }
-
-    td {
-        padding: 6px 0;
-    }
-
-    .right {
-        text-align: right;
-    }
-
-    .total-box {
-        font-size: 20px;
-        font-weight: bold;
-        margin-top: 10px;
-        text-align: right;
-        color: #1a56db;
-    }
+body {
+    margin:0;
+    font-family:'Inter',sans-serif;
+    background:#e9f2ff;
+    padding:15px;
+}
+h2 {
+    text-align:center;
+    color:#1a56db;
+}
+.card {
+    background:#fff;
+    padding:15px;
+    border-radius:12px;
+    box-shadow:0 3px 10px rgba(0,0,0,.1);
+    margin-bottom:20px;
+}
+input,select {
+    width:100%;
+    padding:12px;
+    margin:6px 0;
+    border-radius:8px;
+    border:1px solid #ccc;
+    font-size:16px;
+}
+.btn {
+    width:100%;
+    padding:14px;
+    border:none;
+    border-radius:8px;
+    font-size:18px;
+    font-weight:bold;
+    margin-top:10px;
+    background:#1a56db;
+    color:#fff;
+    cursor:pointer;
+}
+table {
+    width:100%;
+    font-size:15px;
+}
+td { padding:6px 0; }
+.right { text-align:right; }
+.total-box {
+    text-align:right;
+    font-size:20px;
+    font-weight:bold;
+    color:#1a56db;
+}
+.btn-danger {
+    background:#ef4444;
+    padding:6px 10px;
+    font-size:14px;
+}
+.btn-wa { background:#25D366; }
+.small-input {
+    width:70px;
+    display:inline-block;
+}
 </style>
-
-<script src="excel.js"></script>
 </head>
 
 <body>
 
 <h2>Kasir Alkes PKY</h2>
 
+<!-- ===== INPUT BARANG ===== -->
 <div class="card">
     <input id="search" placeholder="Cari nama / barcode..." oninput="cariBarang()">
 
     <select id="listBarang"></select>
 
-    <input id="qty" type="number" placeholder="Qty" value="1">
+    <input id="qty" type="number" value="1" min="1">
 
     <button class="btn" onclick="tambah()">Tambah ke Keranjang</button>
 </div>
 
+<!-- ===== KERANJANG ===== -->
 <div class="card">
     <h3>Keranjang</h3>
     <table id="keranjangList"></table>
+
+    <!-- DISKON -->
+    <input id="diskon" type="number" placeholder="Diskon">
+    <select id="diskonTipe">
+        <option value="rp">Diskon Rupiah</option>
+        <option value="persen">Diskon Persen (%)</option>
+    </select>
+
     <div class="total-box">
         Total: <span id="total">Rp 0</span>
     </div>
 
     <button class="btn" onclick="cetakStruk()">🧾 Cetak Struk</button>
-
-    <!-- 🔥 TOMBOL WA YANG DITAMBAHKAN -->
-    <button class="btn" style="background:#25D366" onclick="kirimWA()">Kirim WhatsApp</button>
+    <button class="btn btn-wa" onclick="kirimWA()">Kirim WhatsApp</button>
 </div>
+
+<!-- ===== SCRIPT ===== -->
+<script src="excel.js"></script>
 
 <script>
 let database = [];
 let keranjang = [];
 
-// === MUAT DATA EXCEL ===
-readExcel("data.xlsx", function(data) {
+/* === LOAD EXCEL === */
+readExcel("data.xlsx", data => {
     database = data;
     renderSelect();
 });
 
-// === RENDER SELECT BARANG ===
+/* === RENDER SELECT === */
 function renderSelect() {
-    let html = "";
-    database.forEach(b => {
-        html += `<option value="${b.nama}" data-harga="${b.harga}">${b.nama} - Rp ${b.harga.toLocaleString()}</option>`;
-    });
-    document.getElementById("listBarang").innerHTML = html;
+    listBarang.innerHTML = database.map(b =>
+        `<option value="${b.nama}" data-harga="${b.harga}">
+        ${b.nama} - Rp ${b.harga.toLocaleString()}
+        </option>`
+    ).join("");
 }
 
-// === SEARCH ===
+/* === SEARCH === */
 function cariBarang() {
-    let q = document.getElementById("search").value.toLowerCase();
-    let hasil = database.filter(b => 
+    let q = search.value.toLowerCase();
+    listBarang.innerHTML = database.filter(b =>
         b.nama.toLowerCase().includes(q) ||
         (b.kode && b.kode.toString().includes(q))
-    );
-
-    let html = "";
-    hasil.forEach(b => {
-        html += `<option value="${b.nama}" data-harga="${b.harga}">${b.nama} - Rp ${b.harga.toLocaleString()}</option>`;
-    });
-
-    document.getElementById("listBarang").innerHTML = html;
+    ).map(b =>
+        `<option value="${b.nama}" data-harga="${b.harga}">
+        ${b.nama} - Rp ${b.harga.toLocaleString()}
+        </option>`
+    ).join("");
 }
 
-// === TAMBAH KE KERANJANG ===
+/* === TAMBAH === */
 function tambah() {
-    let select = document.getElementById("listBarang");
-    let nama = select.value;
-    let harga = Number(select.selectedOptions[0].dataset.harga);
-    let qty = Number(document.getElementById("qty").value);
-
-    keranjang.push({nama, qty, harga});
+    let opt = listBarang.selectedOptions[0];
+    keranjang.push({
+        nama: opt.value,
+        harga: Number(opt.dataset.harga),
+        qty: Number(qty.value)
+    });
     renderKeranjang();
 }
 
-// === RENDER KERANJANG ===
+/* === KERANJANG === */
 function renderKeranjang() {
-    let html = "";
     let total = 0;
-
-    keranjang.forEach(b => {
+    keranjangList.innerHTML = keranjang.map((b,i)=>{
         let sub = b.qty * b.harga;
         total += sub;
+        return `
+        <tr>
+            <td>
+                <strong>${b.nama}</strong><br>
+                Qty <input class="small-input" type="number" value="${b.qty}" min="1"
+                    onchange="ubahQty(${i},this.value)">
+                Harga <input class="small-input" type="number" value="${b.harga}"
+                    onchange="ubahHarga(${i},this.value)">
+                <button class="btn-danger" onclick="hapusItem(${i})">X</button>
+            </td>
+            <td class="right">Rp ${sub.toLocaleString()}</td>
+        </tr>`;
+    }).join("");
 
-        html += `
-            <tr>
-                <td>${b.qty}x ${b.nama}</td>
-                <td class="right">Rp ${sub.toLocaleString()}</td>
-            </tr>
-        `;
-    });
-
-    document.getElementById("keranjangList").innerHTML = html;
-    document.getElementById("total").innerText = "Rp " + total.toLocaleString();
+    let potongan = hitungDiskon(total);
+    totalSpan = document.getElementById("total");
+    totalSpan.innerText = "Rp " + (total - potongan).toLocaleString();
 }
 
-// === CETAK STRUK (FUNPRINT) ===
-function cetakStruk() {
-    localStorage.setItem("strukData", JSON.stringify(keranjang));
-    window.location.href = "struk.html";
-}
-
-// === 🔥 FITUR KIRIM STRUK VIA WHATSAPP ===
-function kirimWA() {
-    if (keranjang.length === 0) {
-        alert("Keranjang masih kosong!");
-        return;
+/* === EDIT === */
+function ubahQty(i,v){ keranjang[i].qty = Number(v); renderKeranjang(); }
+function ubahHarga(i,v){ keranjang[i].harga = Number(v); renderKeranjang(); }
+function hapusItem(i){
+    if(confirm("Hapus item?")){
+        keranjang.splice(i,1);
+        renderKeranjang();
     }
+}
 
-    let pesan = "*STRUK PEMBELIAN*\n";
-    pesan += "=====================\n";
+/* === DISKON === */
+diskon.oninput = diskonTipe.onchange = renderKeranjang;
 
-    let total = 0;
+function hitungDiskon(total){
+    let d = Number(diskon.value || 0);
+    return diskonTipe.value === "persen" ? total*d/100 : d;
+}
 
-    keranjang.forEach(b => {
-        let sub = b.qty * b.harga;
-        total += sub;
-        pesan += `${b.qty}x ${b.nama} = Rp ${sub.toLocaleString()}\n`;
+/* === CETAK === */
+function cetakStruk(){
+    let subtotal = keranjang.reduce((s,b)=>s+b.qty*b.harga,0);
+    let pot = hitungDiskon(subtotal);
+    localStorage.setItem("strukData", JSON.stringify({
+        items:keranjang,
+        subtotal,
+        diskon:pot,
+        total:subtotal-pot
+    }));
+    location.href="struk.html";
+}
+
+/* === WHATSAPP === */
+function kirimWA(){
+    if(!keranjang.length) return alert("Keranjang kosong");
+    let t="", total=0;
+    keranjang.forEach(b=>{
+        let s=b.qty*b.harga; total+=s;
+        t+=`${b.qty}x ${b.nama} = Rp ${s.toLocaleString()}\n`;
     });
-
-    pesan += "=====================\n";
-    pesan += `*Total: Rp ${total.toLocaleString()}*\n\n`;
-    pesan += "Terima kasih telah berbelanja 🙏";
-
-    let textWA = encodeURIComponent(pesan);
-
-    // Isi jika ingin langsung ke nomor tertentu, atau kosongkan untuk pilih kontak
-    let nomor = ""; // contoh: "6281234567890"
-
-    window.open(`https://wa.me/${nomor}?text=${textWA}`, "_blank");
+    let pot=hitungDiskon(total);
+    t+=`\nSubtotal : Rp ${total.toLocaleString()}`;
+    t+=`\nDiskon : Rp ${pot.toLocaleString()}`;
+    t+=`\nTOTAL : Rp ${(total-pot).toLocaleString()}`;
+    open(`https://wa.me/?text=${encodeURIComponent(t)}`);
 }
 </script>
 
-<script src="funprint.js"></script>
 <script>
-if ("serviceWorker" in navigator) {
+if("serviceWorker" in navigator){
     navigator.serviceWorker.register("sw.js");
 }
 </script>

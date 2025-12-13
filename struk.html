@@ -3,65 +3,63 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
 <title>Struk</title>
 
 <style>
-    body {
-        margin: 0;
-        padding: 0;
-        background: #fff;
-        font-family: monospace;
-    }
+body {
+    margin: 0;
+    padding: 0;
+    background: #fff;
+    font-family: monospace;
+}
 
-    /* Lebar FIX 384px agar tidak berubah di Funprint */
-    .receipt {
-        width: 310px;
-        max-width: 310px;
-        padding: 4px;
-        margin: 0 auto;
-        font-size: 16px;
-        line-height: 1.35;
-    }
+/* Lebar FIX agar stabil di Funprint */
+.receipt {
+    width: 310px;
+    max-width: 310px;
+    padding: 4px;
+    margin: 0 auto;
+    font-size: 16px;
+    line-height: 1.35;
+}
 
-    .center { text-align: center; }
+.center { text-align: center; }
 
-    .divider {
-        border-top: 1px dashed #000;
-        margin: 8px 0;
-    }
+.divider {
+    border-top: 1px dashed #000;
+    margin: 8px 0;
+}
 
-    /* Baris item stabil */
-    .row {
-        display: flex;
-        justify-content: space-between;
-        width: 100%;
-    }
+.row {
+    display: flex;
+    justify-content: space-between;
+    width: 100%;
+}
 
-    .item-name {
-        font-weight: bold;
-        max-width: 240px; /* cegah nama terlalu panjang melebar */
-        word-wrap: break-word;
-    }
+.item-name {
+    font-weight: bold;
+    max-width: 240px;
+    word-wrap: break-word;
+}
 
-    .item-sub {
-        text-align: right;
-        min-width: 120px;
-    }
+.item-sub {
+    text-align: right;
+    min-width: 120px;
+}
 
-    .title {
-        font-size: 20px;
-        font-weight: bold;
-    }
+.title {
+    font-size: 20px;
+    font-weight: bold;
+}
 </style>
-
 </head>
+
 <body>
 
 <div class="receipt" id="strukArea">
 
     <div class="center">
-        <img src="logo.png" style="width:70px; height:70px;"><br>
+        <img src="logo.png" style="width:70px;height:70px;"><br>
         <div class="title">Alkes PKY</div>
     </div>
 
@@ -71,8 +69,23 @@
 
     <div class="divider"></div>
 
-    <div class="row" style="font-size:18px; font-weight:bold;">
-        <span>Total:</span>
+    <!-- SUBTOTAL -->
+    <div class="row">
+        <span>Subtotal</span>
+        <span id="subtotal"></span>
+    </div>
+
+    <!-- DISKON -->
+    <div class="row">
+        <span>Diskon</span>
+        <span id="diskon"></span>
+    </div>
+
+    <div class="divider"></div>
+
+    <!-- TOTAL AKHIR -->
+    <div class="row" style="font-size:18px;font-weight:bold;">
+        <span>Total</span>
         <span id="total"></span>
     </div>
 
@@ -87,17 +100,15 @@
 
 <script>
 // ========================
-// LOAD DATA KERANJANG
+// LOAD DATA STRUK
 // ========================
-let data = JSON.parse(localStorage.getItem("strukData") || "[]");
+let data = JSON.parse(localStorage.getItem("strukData"));
 
 let html = "";
-let total = 0;
 
-data.forEach(b => {
+// item
+data.items.forEach(b => {
     let sub = b.qty * b.harga;
-    total += sub;
-
     html += `
         <div class="item-name">${b.nama}</div>
         <div class="row">
@@ -109,7 +120,16 @@ data.forEach(b => {
 });
 
 document.getElementById("itemList").innerHTML = html;
-document.getElementById("total").innerText = "Rp " + total.toLocaleString();
+
+// nilai
+document.getElementById("subtotal").innerText =
+    "Rp " + data.subtotal.toLocaleString();
+
+document.getElementById("diskon").innerText =
+    "- Rp " + data.diskon.toLocaleString();
+
+document.getElementById("total").innerText =
+    "Rp " + data.total.toLocaleString();
 </script>
 
 </body>
