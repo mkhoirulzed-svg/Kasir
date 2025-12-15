@@ -28,6 +28,16 @@ h2 {
     text-align:center;
     color:#1a56db;
 }
+.header {
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    gap:10px;
+    margin-bottom:10px;
+}
+.header img {
+    height:40px;
+}
 .card {
     background:#fff;
     padding:15px;
@@ -77,14 +87,29 @@ td { padding:6px 0; }
     width:70px;
     display:inline-block;
 }
+
+/* ===== SEMATKAN MENU ===== */
+.toggle-btn {
+    background:#f1f5ff;
+    color:#1a56db;
+    border:1px dashed #1a56db;
+    font-size:15px;
+}
+.manual-box {
+    display:none;
+    margin-top:10px;
+}
 </style>
 </head>
 
 <body>
 
-<h2>Kasir Alkes PKY</h2>
+<div class="header">
+    <img src="logo.png" alt="Logo">
+    <h2>Kasir Alkes PKY</h2>
+</div>
 
-<!-- ===== INPUT BARANG ===== -->
+<!-- ===== INPUT BARANG DATABASE ===== -->
 <div class="card">
     <input id="search" placeholder="Cari nama / barcode..." oninput="cariBarang()">
 
@@ -93,6 +118,18 @@ td { padding:6px 0; }
     <input id="qty" type="number" value="1" min="1">
 
     <button class="btn" onclick="tambah()">Tambah ke Keranjang</button>
+
+    <!-- ===== TOGGLE TAMBAH MANUAL ===== -->
+    <button class="btn toggle-btn" onclick="toggleManual()">
+        ➕ Tambah Barang Manual
+    </button>
+
+    <div id="manualBox" class="manual-box">
+        <input id="manualNama" placeholder="Nama Barang">
+        <input id="manualHarga" type="number" placeholder="Harga">
+        <input id="manualQty" type="number" value="1" min="1">
+        <button class="btn" onclick="tambahManual()">Simpan Barang Manual</button>
+    </div>
 </div>
 
 <!-- ===== KERANJANG ===== -->
@@ -100,7 +137,6 @@ td { padding:6px 0; }
     <h3>Keranjang</h3>
     <table id="keranjangList"></table>
 
-    <!-- DISKON -->
     <input id="diskon" type="number" placeholder="Diskon">
     <select id="diskonTipe">
         <option value="rp">Diskon Rupiah</option>
@@ -150,7 +186,7 @@ function cariBarang() {
     ).join("");
 }
 
-/* === TAMBAH === */
+/* === TAMBAH DATABASE === */
 function tambah() {
     let opt = listBarang.selectedOptions[0];
     keranjang.push({
@@ -159,6 +195,30 @@ function tambah() {
         qty: Number(qty.value)
     });
     renderKeranjang();
+}
+
+/* === TAMBAH MANUAL === */
+function tambahManual(){
+    if(!manualNama.value || !manualHarga.value)
+        return alert("Lengkapi data barang manual");
+
+    keranjang.push({
+        nama: manualNama.value,
+        harga: Number(manualHarga.value),
+        qty: Number(manualQty.value)
+    });
+
+    manualNama.value="";
+    manualHarga.value="";
+    manualQty.value=1;
+    renderKeranjang();
+}
+
+/* === TOGGLE MANUAL === */
+function toggleManual(){
+    manualBox.style.display =
+        manualBox.style.display==="none" || !manualBox.style.display
+        ? "block" : "none";
 }
 
 /* === KERANJANG === */
@@ -171,7 +231,7 @@ function renderKeranjang() {
         <tr>
             <td>
                 <strong>${b.nama}</strong><br>
-                Qty <input class="small-input" type="number" value="${b.qty}" min="1"
+                Qty <input class="small-input" type="number" value="${b.qty}"
                     onchange="ubahQty(${i},this.value)">
                 Harga <input class="small-input" type="number" value="${b.harga}"
                     onchange="ubahHarga(${i},this.value)">
@@ -182,8 +242,8 @@ function renderKeranjang() {
     }).join("");
 
     let potongan = hitungDiskon(total);
-    totalSpan = document.getElementById("total");
-    totalSpan.innerText = "Rp " + (total - potongan).toLocaleString();
+    document.getElementById("total").innerText =
+        "Rp " + (total - potongan).toLocaleString();
 }
 
 /* === EDIT === */
@@ -231,9 +291,8 @@ function kirimWA(){
     t+=`\nTOTAL : Rp ${(total-pot).toLocaleString()}`;
     open(`https://wa.me/?text=${encodeURIComponent(t)}`);
 }
-</script>
 
-<script>
+/* === SW === */
 if("serviceWorker" in navigator){
     navigator.serviceWorker.register("sw.js");
 }
