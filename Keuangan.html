@@ -1,65 +1,31 @@
-<!DOCTYPE html>
-<html lang="id">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Input Keuangan</title>
-
-<style>
-body {
-  font-family: system-ui;
-  padding: 16px;
-  background: #f9fafb;
-}
-input, select, button {
-  width: 100%;
-  padding: 12px;
-  margin-bottom: 10px;
-}
-button {
-  background: #0f766e;
-  color: white;
-  border: none;
-  border-radius: 6px;
-}
-</style>
-</head>
-
-<body>
-
-<h2>Input Transaksi</h2>
-
-<input type="date" id="tanggal">
-<select id="jenis">
-  <option value="Pemasukan">Pemasukan</option>
-  <option value="Pengeluaran">Pengeluaran</option>
-</select>
-<input type="text" id="keterangan" placeholder="Keterangan">
-<input type="number" id="qty" placeholder="Jumlah">
-<input type="number" id="harga" placeholder="Harga">
-<button onclick="simpan()">Simpan</button>
-
 <script>
 const API_URL = "https://script.google.com/macros/s/AKfycbyHI24gsVMD3ycm_qulWY_45IPPSZ4DohKNk8fX1pWZrzHpgOK6hWLLYz_qFihdGWcr2g/exec";
 
 function simpan() {
-  fetch(https://script.google.com/macros/s/AKfycbyHI24gsVMD3ycm_qulWY_45IPPSZ4DohKNk8fX1pWZrzHpgOK6hWLLYz_qFihdGWcr2g/exec, {
+  fetch(API_URL, {
     method: "POST",
+    headers: {
+      "Content-Type": "application/json"
+    },
     body: JSON.stringify({
-      tanggal: tanggal.value,
-      jenis: jenis.value,
-      keterangan: keterangan.value,
-      qty: qty.value,
-      harga: harga.value
+      tanggal: document.getElementById("tanggal").value,
+      jenis: document.getElementById("jenis").value,
+      keterangan: document.getElementById("keterangan").value,
+      qty: document.getElementById("qty").value,
+      harga: document.getElementById("harga").value
     })
   })
   .then(res => res.json())
-  .then(() => {
-    alert("Data tersimpan");
-    document.querySelectorAll("input").forEach(i => i.value = "");
+  .then(res => {
+    if (res.status === "success") {
+      alert("Data tersimpan");
+      document.querySelectorAll("input").forEach(i => i.value = "");
+    } else {
+      alert("Gagal menyimpan");
+    }
+  })
+  .catch(err => {
+    alert("Error: " + err.message);
   });
 }
 </script>
-
-</body>
-</html>
