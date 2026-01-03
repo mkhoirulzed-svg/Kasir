@@ -30,6 +30,7 @@ button {
 <h2>Input Transaksi</h2>
 
 <input type="date" id="tanggal">
+
 <select id="jenis">
   <option value="Pemasukan">Pemasukan</option>
   <option value="Pengeluaran">Pengeluaran</option>
@@ -37,8 +38,13 @@ button {
 
 <input type="text" id="keterangan" placeholder="Keterangan">
 <input type="number" id="qty" placeholder="Jumlah">
-<input type="number" id="harga" placeholder="Harga">
 
+<!-- HARGA KHUSUS PENGELUARAN -->
+<div id="hargaWrapper">
+  <input type="number" id="harga" placeholder="Harga">
+</div>
+
+<!-- KHUSUS PEMASUKAN -->
 <div id="pemasukanExtra" style="display:none;">
   <input type="number" id="hargaModal" placeholder="Harga Modal">
   <input type="number" id="hargaJual" placeholder="Harga Jual">
@@ -49,17 +55,25 @@ button {
 <script>
 const API_URL = "https://script.google.com/macros/s/AKfycbz3XTARB3Vd1pANXA5MZ1KqbquHLRC4eO3K6uZENRxfjtvnE1Nb7gv0AHEkxqDxyejGtA/exec";
 
-// Tampilkan field tambahan jika pemasukan
+// Toggle field berdasarkan jenis transaksi
 document.getElementById("jenis").addEventListener("change", function () {
-  const extra = document.getElementById("pemasukanExtra");
+  const pemasukanExtra = document.getElementById("pemasukanExtra");
+  const hargaWrapper   = document.getElementById("hargaWrapper");
+
   if (this.value === "Pemasukan") {
-    extra.style.display = "block";
+    pemasukanExtra.style.display = "block";
+    hargaWrapper.style.display = "none";
+    harga.value = "";
   } else {
-    extra.style.display = "none";
+    pemasukanExtra.style.display = "none";
+    hargaWrapper.style.display = "block";
     hargaModal.value = "";
     hargaJual.value = "";
   }
 });
+
+// Set default saat pertama kali dibuka
+document.getElementById("jenis").dispatchEvent(new Event("change"));
 
 function simpan() {
   const params = new URLSearchParams();
@@ -67,7 +81,7 @@ function simpan() {
   params.append("jenis", jenis.value);
   params.append("keterangan", keterangan.value);
   params.append("qty", qty.value);
-  params.append("harga", harga.value);
+  params.append("harga", harga.value || 0);
   params.append("harga_modal", hargaModal.value || 0);
   params.append("harga_jual", hargaJual.value || 0);
 
@@ -78,7 +92,7 @@ function simpan() {
   .then(() => {
     alert("Data berhasil disimpan");
     document.querySelectorAll("input").forEach(i => i.value = "");
-    pemasukanExtra.style.display = "none";
+    document.getElementById("jenis").dispatchEvent(new Event("change"));
   })
   .catch(err => {
     alert("Gagal menyimpan");
