@@ -25,7 +25,7 @@ body{
   padding-top:120px;
 }
 
-/* ===== APP HEADER (SAMA) ===== */
+/* ===== APP HEADER ===== */
 .app-header{
   position:fixed;
   top:0;left:0;right:0;
@@ -99,12 +99,12 @@ th{
   color:#dc2626;
   font-weight:600;
 }
-  /* ===== REKAP BOX ===== */
+
+/* ===== REKAP BOX ===== */
 .rekap-box h3 {
   margin-bottom:10px;
   color:#1a56db;
 }
-
 .rekap-item {
   display:flex;
   justify-content:space-between;
@@ -112,19 +112,15 @@ th{
   border-bottom:1px dashed #e5e7eb;
   font-size:15px;
 }
-
 .rekap-item:last-child {
   border-bottom:none;
 }
-
 .rekap-item strong {
   font-size:16px;
 }
-
 .rekap-item.total strong {
   color:#1a56db;
 }
-
 </style>
 </head>
 
@@ -164,7 +160,7 @@ th{
     </a>
   </div>
 </div>
-  
+
 <!-- ===== HASIL REKAP ===== -->
 <div class="card rekap-box">
   <h3>Rekap Transaksi</h3>
@@ -177,6 +173,11 @@ th{
   <div class="rekap-item">
     <span>Pengeluaran Bulan Ini</span>
     <strong id="rekapPengeluaran">Rp 0</strong>
+  </div>
+
+  <div class="rekap-item">
+    <span>Laba Bulan Ini</span>
+    <strong id="rekapLaba">Rp 0</strong>
   </div>
 
   <div class="rekap-item total">
@@ -226,11 +227,7 @@ function loadTransaksi(){
   .catch(()=>alert("Gagal memuat data transaksi"));
 }
 
-loadTransaksi();
-loadRekap();
-
-
-  function loadRekap() {
+function loadRekap() {
   fetch(API_URL + "?action=rekap")
     .then(r => r.json())
     .then(d => {
@@ -240,11 +237,17 @@ loadRekap();
       document.getElementById("rekapPengeluaran").innerText =
         "Rp " + Number(d.pengeluaran_bulan_ini).toLocaleString();
 
+      document.getElementById("rekapLaba").innerText =
+        "Rp " + Number(d.laba_bulan_ini).toLocaleString();
+
       const saldo = d.pemasukan_bulan_ini - d.pengeluaran_bulan_ini;
       document.getElementById("rekapSaldo").innerText =
         "Rp " + saldo.toLocaleString();
     });
 }
+
+loadTransaksi();
+loadRekap();
 </script>
 
 </body>
