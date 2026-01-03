@@ -55,6 +55,9 @@ button {
 <script>
 const API_URL = "https://script.google.com/macros/s/AKfycbz3XTARB3Vd1pANXA5MZ1KqbquHLRC4eO3K6uZENRxfjtvnE1Nb7gv0AHEkxqDxyejGtA/exec";
 
+  const today = new Date().toISOString().split("T")[0];
+document.getElementById("tanggal").value = today;
+  
 // Toggle field berdasarkan jenis transaksi
 document.getElementById("jenis").addEventListener("change", function () {
   const pemasukanExtra = document.getElementById("pemasukanExtra");
