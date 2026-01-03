@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<!-- ===== PWA & ICON ===== -->
+<link rel="icon" type="image/png" href="logo.png">
+<link rel="apple-touch-icon" href="logo.png">
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#1a56db">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Data Transaksi - Alkes PKY</title>
+
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600&display=swap">
+
+<style>
+/* ===== GLOBAL ===== */
+body{
+  margin:0;
+  font-family:'Inter',sans-serif;
+  background:#e9f2ff;
+  padding:15px;
+  padding-top:120px;
+}
+
+/* ===== APP HEADER (SAMA) ===== */
+.app-header{
+  position:fixed;
+  top:0;left:0;right:0;
+  background:#fff;
+  display:flex;
+  flex-direction:column;
+  padding:10px 12px 0;
+  border-bottom:1px solid #e5e7eb;
+  z-index:1000;
+}
+.app-brand{
+  display:flex;
+  align-items:center;
+  gap:10px;
+  font-weight:600;
+  color:#1a56db;
+  margin-bottom:6px;
+}
+.app-brand img{ height:32px; }
+.app-menu{ display:flex; }
+.app-menu a{
+  flex:1;
+  padding:10px 0;
+  text-align:center;
+  text-decoration:none;
+  color:#64748b;
+  font-size:14px;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  gap:4px;
+}
+.app-menu a svg{
+  width:20px;height:20px;
+  stroke:currentColor;
+  fill:none;
+  stroke-width:2;
+}
+.app-menu a.active{
+  color:#1a56db;
+  border-bottom:3px solid #1a56db;
+}
+
+/* ===== CARD & TABLE ===== */
+.card{
+  background:#fff;
+  padding:15px;
+  border-radius:12px;
+  box-shadow:0 3px 10px rgba(0,0,0,.1);
+}
+table{
+  width:100%;
+  border-collapse:collapse;
+  font-size:14px;
+}
+th,td{
+  padding:8px 6px;
+  border-bottom:1px solid #e5e7eb;
+}
+th{
+  background:#f1f5ff;
+  color:#1a56db;
+  text-align:left;
+}
+.right{ text-align:right; }
+.badge-in{
+  color:#16a34a;
+  font-weight:600;
+}
+.badge-out{
+  color:#dc2626;
+  font-weight:600;
+}
+</style>
+</head>
+
+<body>
+
+<!-- ===== HEADER ===== -->
+<div class="app-header">
+  <div class="app-brand">
+    <img src="logo.png" alt="Logo">
+    <span>Kasir Alkes PKY</span>
+  </div>
+
+  <div class="app-menu">
+    <a href="index.html">
+      <svg viewBox="0 0 24 24">
+        <rect x="3" y="4" width="18" height="6" rx="2"/>
+        <path d="M4 10h16l-1.5 8a2 2 0 0 1-2 1.6H7.5a2 2 0 0 1-2-1.6L4 10Z"/>
+        <circle cx="9" cy="21" r="1"/>
+        <circle cx="15" cy="21" r="1"/>
+      </svg>
+      <span>Kasir</span>
+    </a>
+
+    <a href="keuangan.html">
+      <svg viewBox="0 0 24 24">
+        <rect x="4" y="3" width="16" height="18" rx="2"/>
+        <path d="M8 7h8M8 11h8M8 15h5"/>
+      </svg>
+      <span>Input</span>
+    </a>
+
+    <a href="transaksi.html" class="active">
+      <svg viewBox="0 0 24 24">
+        <path d="M4 6h16M4 12h16M4 18h16"/>
+      </svg>
+      <span>Transaksi</span>
+    </a>
+  </div>
+</div>
+
+<!-- ===== DATA TRANSAKSI ===== -->
+<div class="card">
+  <h3>Transaksi Terakhir</h3>
+
+  <table>
+    <thead>
+      <tr>
+        <th>Tanggal</th>
+        <th>Jenis</th>
+        <th>Keterangan</th>
+        <th class="right">Total</th>
+        <th class="right">Laba</th>
+      </tr>
+    </thead>
+    <tbody id="listTransaksi"></tbody>
+  </table>
+</div>
+
+<script>
+const API_URL="https://script.google.com/macros/s/AKfycbz3XTARB3Vd1pANXA5MZ1KqbquHLRC4eO3K6uZENRxfjtvnE1Nb7gv0AHEkxqDxyejGtA/exec";
+
+function loadTransaksi(){
+  fetch(API_URL+"?action=transaksi")
+  .then(r=>r.json())
+  .then(data=>{
+    const el=document.getElementById("listTransaksi");
+    el.innerHTML="";
+    data.forEach(t=>{
+      el.innerHTML+=`
+      <tr>
+        <td>${t.tanggal}</td>
+        <td class="${t.jenis==="Pemasukan"?"badge-in":"badge-out"}">${t.jenis}</td>
+        <td>${t.keterangan}</td>
+        <td class="right">Rp ${Number(t.total).toLocaleString()}</td>
+        <td class="right">Rp ${Number(t.laba).toLocaleString()}</td>
+      </tr>`;
+    });
+  })
+  .catch(()=>alert("Gagal memuat data transaksi"));
+}
+
+loadTransaksi();
+</script>
+
+</body>
+</html>
