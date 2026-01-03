@@ -36,7 +36,13 @@ button {
   <option value="Pengeluaran">Pengeluaran</option>
 </select>
 
-<input type="text" id="keterangan" placeholder="Keterangan">
+<!-- CARI BARANG -->
+<input type="text" id="cariBarang" placeholder="Cari barang...">
+
+<!-- AUTOCOMPLETE BARANG -->
+<input list="daftarBarang" id="keterangan" placeholder="Nama Barang">
+<datalist id="daftarBarang"></datalist>
+
 <input type="number" id="qty" placeholder="Jumlah">
 
 <!-- HARGA KHUSUS PENGELUARAN -->
@@ -46,7 +52,7 @@ button {
 
 <!-- KHUSUS PEMASUKAN -->
 <div id="pemasukanExtra" style="display:none;">
-  <input type="number" id="hargaModal" placeholder="Harga Modal">
+  <input type="number" id="hargaModal" placeholder="Harga Modal (otomatis, bisa diubah)">
   <input type="number" id="hargaJual" placeholder="Harga Jual">
 </div>
 
@@ -55,15 +61,13 @@ button {
 <script>
 const API_URL = "https://script.google.com/macros/s/AKfycbz3XTARB3Vd1pANXA5MZ1KqbquHLRC4eO3K6uZENRxfjtvnE1Nb7gv0AHEkxqDxyejGtA/exec";
 
-  const today = new Date().toISOString().split("T")[0];
-document.getElementById("tanggal").value = today;
-  
-// Toggle field berdasarkan jenis transaksi
-document.getElementById("jenis").addEventListener("change", function () {
-  const pemasukanExtra = document.getElementById("pemasukanExtra");
-  const hargaWrapper   = document.getElementById("hargaWrapper");
+// ===== TANGGAL DEFAULT HARI INI =====
+const today = new Date().toISOString().split("T")[0];
+tanggal.value = today;
 
-  if (this.value === "Pemasukan") {
+// ===== TOGGLE FORM BERDASARKAN JENIS =====
+jenis.addEventListener("change", () => {
+  if (jenis.value === "Pemasukan") {
     pemasukanExtra.style.display = "block";
     hargaWrapper.style.display = "none";
     harga.value = "";
@@ -74,10 +78,46 @@ document.getElementById("jenis").addEventListener("change", function () {
     hargaJual.value = "";
   }
 });
+jenis.dispatchEvent(new Event("change"));
 
-// Set default saat pertama kali dibuka
-document.getElementById("jenis").dispatchEvent(new Event("change"));
+// ===== AMBIL DATA BARANG DARI SPREADSHEET =====
+let BARANG = [];
 
+fetch(API_URL + "?action=barang")
+  .then(res => res.json())
+  .then(data => {
+    BARANG = data;
+    renderDatalist(BARANG);
+  });
+
+function renderDatalist(data) {
+  daftarBarang.innerHTML = "";
+  data.forEach(item => {
+    const opt = document.createElement("option");
+    opt.value = item.nama;
+    daftarBarang.appendChild(opt);
+  });
+}
+
+// ===== FILTER BARANG SAAT CARI =====
+cariBarang.addEventListener("input", function () {
+  const keyword = this.value.toLowerCase();
+  const filtered = BARANG.filter(b =>
+    b.nama.toLowerCase().includes(keyword)
+  );
+  renderDatalist(filtered);
+});
+
+// ===== AUTO ISI HARGA SAAT BARANG DIPILIH =====
+keterangan.addEventListener("change", function () {
+  const item = BARANG.find(b => b.nama === this.value);
+  if (item) {
+    hargaModal.value = item.modal || "";
+    hargaJual.value  = item.jual || "";
+  }
+});
+
+// ===== SIMPAN DATA =====
 function simpan() {
   const params = new URLSearchParams();
   params.append("tanggal", tanggal.value);
@@ -95,7 +135,9 @@ function simpan() {
   .then(() => {
     alert("Data berhasil disimpan");
     document.querySelectorAll("input").forEach(i => i.value = "");
-    document.getElementById("jenis").dispatchEvent(new Event("change"));
+    tanggal.value = today;
+    cariBarang.value = "";
+    jenis.dispatchEvent(new Event("change"));
   })
   .catch(err => {
     alert("Gagal menyimpan");
