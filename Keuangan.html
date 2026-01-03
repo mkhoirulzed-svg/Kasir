@@ -34,17 +34,32 @@ button {
   <option value="Pemasukan">Pemasukan</option>
   <option value="Pengeluaran">Pengeluaran</option>
 </select>
+
 <input type="text" id="keterangan" placeholder="Keterangan">
 <input type="number" id="qty" placeholder="Jumlah">
 <input type="number" id="harga" placeholder="Harga">
-  <div id="pemasukanExtra" style="display:none;">
+
+<div id="pemasukanExtra" style="display:none;">
   <input type="number" id="hargaModal" placeholder="Harga Modal">
   <input type="number" id="hargaJual" placeholder="Harga Jual">
 </div>
+
 <button onclick="simpan()">Simpan</button>
 
 <script>
 const API_URL = "https://script.google.com/macros/s/AKfycbz3XTARB3Vd1pANXA5MZ1KqbquHLRC4eO3K6uZENRxfjtvnE1Nb7gv0AHEkxqDxyejGtA/exec";
+
+// Tampilkan field tambahan jika pemasukan
+document.getElementById("jenis").addEventListener("change", function () {
+  const extra = document.getElementById("pemasukanExtra");
+  if (this.value === "Pemasukan") {
+    extra.style.display = "block";
+  } else {
+    extra.style.display = "none";
+    hargaModal.value = "";
+    hargaJual.value = "";
+  }
+});
 
 function simpan() {
   const params = new URLSearchParams();
@@ -53,8 +68,6 @@ function simpan() {
   params.append("keterangan", keterangan.value);
   params.append("qty", qty.value);
   params.append("harga", harga.value);
-
-  // Tambahan khusus pemasukan
   params.append("harga_modal", hargaModal.value || 0);
   params.append("harga_jual", hargaJual.value || 0);
 
@@ -65,26 +78,14 @@ function simpan() {
   .then(() => {
     alert("Data berhasil disimpan");
     document.querySelectorAll("input").forEach(i => i.value = "");
-  });
-}
+    pemasukanExtra.style.display = "none";
+  })
   .catch(err => {
     alert("Gagal menyimpan");
     console.error(err);
   });
 }
-
-  jenis.addEventListener("change", () => {
-  const extra = document.getElementById("pemasukanExtra");
-  if (jenis.value === "Pemasukan") {
-    extra.style.display = "block";
-  } else {
-    extra.style.display = "none";
-    hargaModal.value = "";
-    hargaJual.value = "";
-  }
-});
 </script>
-
 
 </body>
 </html>
