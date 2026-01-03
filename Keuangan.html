@@ -37,6 +37,10 @@ button {
 <input type="text" id="keterangan" placeholder="Keterangan">
 <input type="number" id="qty" placeholder="Jumlah">
 <input type="number" id="harga" placeholder="Harga">
+  <div id="pemasukanExtra" style="display:none;">
+  <input type="number" id="hargaModal" placeholder="Harga Modal">
+  <input type="number" id="hargaJual" placeholder="Harga Jual">
+</div>
 <button onclick="simpan()">Simpan</button>
 
 <script>
@@ -50,6 +54,10 @@ function simpan() {
   params.append("qty", qty.value);
   params.append("harga", harga.value);
 
+  // Tambahan khusus pemasukan
+  params.append("harga_modal", hargaModal.value || 0);
+  params.append("harga_jual", hargaJual.value || 0);
+
   fetch(API_URL, {
     method: "POST",
     body: params
@@ -57,12 +65,24 @@ function simpan() {
   .then(() => {
     alert("Data berhasil disimpan");
     document.querySelectorAll("input").forEach(i => i.value = "");
-  })
+  });
+}
   .catch(err => {
     alert("Gagal menyimpan");
     console.error(err);
   });
 }
+
+  jenis.addEventListener("change", () => {
+  const extra = document.getElementById("pemasukanExtra");
+  if (jenis.value === "Pemasukan") {
+    extra.style.display = "block";
+  } else {
+    extra.style.display = "none";
+    hargaModal.value = "";
+    hargaJual.value = "";
+  }
+});
 </script>
 
 
