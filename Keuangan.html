@@ -45,28 +45,24 @@ const API_URL = "https://script.google.com/macros/s/AKfycbyHI24gsVMD3ycm_qulWY_4
 function simpan() {
   fetch(API_URL, {
     method: "POST",
+    mode: "no-cors",
     headers: {
       "Content-Type": "application/json"
     },
     body: JSON.stringify({
-      tanggal: document.getElementById("tanggal").value,
-      jenis: document.getElementById("jenis").value,
-      keterangan: document.getElementById("keterangan").value,
-      qty: document.getElementById("qty").value,
-      harga: document.getElementById("harga").value
+      tanggal: tanggal.value,
+      jenis: jenis.value,
+      keterangan: keterangan.value,
+      qty: qty.value,
+      harga: harga.value
     })
   })
-  .then(res => res.json())
-  .then(res => {
-    if (res.status === "success") {
-      alert("Data tersimpan");
-      document.querySelectorAll("input").forEach(i => i.value = "");
-    } else {
-      alert("Gagal menyimpan");
-    }
+  .then(() => {
+    alert("Data terkirim");
+    document.querySelectorAll("input").forEach(i => i.value = "");
   })
   .catch(err => {
-    alert("Error: " + err.message);
+    alert("Gagal: " + err);
   });
 }
 </script>
