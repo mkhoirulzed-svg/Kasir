@@ -107,9 +107,10 @@ cariBarang.addEventListener("input", function () {
 // ===== AUTO ISI HARGA SAAT BARANG DIPILIH =====
 keterangan.addEventListener("change", function () {
   const item = BARANG.find(b => b.nama === this.value);
+
   if (item) {
     hargaModal.value = item.modal || "";
-    hargaJual.value  = item.jual || "";
+    hargaJual.value  = item.jual  || "";
   }
 });
 
