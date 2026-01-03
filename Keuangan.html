@@ -1,157 +1,217 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
+<!-- ===== PWA & ICON ===== -->
+<link rel="icon" type="image/png" href="logo.png">
+<link rel="apple-touch-icon" href="logo.png">
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#1a56db">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Input Keuangan</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Input Transaksi - Alkes PKY</title>
+
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600&display=swap">
 
 <style>
-body {
-  font-family: system-ui, -apple-system, BlinkMacSystemFont;
-  padding: 16px;
-  background: #f9fafb;
+/* ===== GLOBAL (SAMA DENGAN INDEX) ===== */
+body{
+  margin:0;
+  font-family:'Inter',sans-serif;
+  background:#e9f2ff;
+  padding:15px;
+  padding-top:120px;
 }
-input, select, button {
-  width: 100%;
-  padding: 12px;
-  margin-bottom: 10px;
-  border-radius: 6px;
-  border: 1px solid #d1d5db;
+
+/* ===== APP HEADER (SAMA PERSIS) ===== */
+.app-header{
+  position:fixed;
+  top:0;left:0;right:0;
+  background:#fff;
+  display:flex;
+  flex-direction:column;
+  padding:10px 12px 0;
+  border-bottom:1px solid #e5e7eb;
+  z-index:1000;
 }
-button {
-  background: #0f766e;
-  color: white;
-  border: none;
-  font-weight: 600;
+.app-brand{
+  display:flex;
+  align-items:center;
+  gap:10px;
+  font-weight:600;
+  color:#1a56db;
+  margin-bottom:6px;
 }
-h2 {
-  margin-bottom: 12px;
+.app-brand img{ height:32px; }
+.app-menu{ display:flex; }
+.app-menu a{
+  flex:1;
+  padding:10px 0;
+  text-align:center;
+  text-decoration:none;
+  color:#64748b;
+  font-size:14px;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  gap:4px;
+}
+.app-menu a svg{
+  width:20px;height:20px;
+  stroke:currentColor;
+  fill:none;
+  stroke-width:2;
+}
+.app-menu a.active{
+  color:#1a56db;
+  border-bottom:3px solid #1a56db;
+}
+
+/* ===== FORM KEUANGAN ===== */
+.card{
+  background:#fff;
+  padding:15px;
+  border-radius:12px;
+  box-shadow:0 3px 10px rgba(0,0,0,.1);
+}
+input,select,button{
+  width:100%;
+  padding:12px;
+  margin-bottom:10px;
+  border-radius:8px;
+  border:1px solid #ccc;
+  font-size:16px;
+}
+button{
+  background:#1a56db;
+  color:#fff;
+  border:none;
+  font-weight:600;
 }
 </style>
 </head>
 
 <body>
 
-<h2>Input Transaksi</h2>
+<!-- ===== HEADER + MENU (SAMA) ===== -->
+<div class="app-header">
+  <div class="app-brand">
+    <img src="logo.png" alt="Logo">
+    <span>Kasir Alkes PKY</span>
+  </div>
 
-<input type="date" id="tanggal">
+  <div class="app-menu">
+    <a href="index.html">
+      <svg viewBox="0 0 24 24">
+        <rect x="3" y="4" width="18" height="6" rx="2"/>
+        <path d="M4 10h16l-1.5 8a2 2 0 0 1-2 1.6H7.5a2 2 0 0 1-2-1.6L4 10Z"/>
+        <circle cx="9" cy="21" r="1"/>
+        <circle cx="15" cy="21" r="1"/>
+      </svg>
+      <span>Kasir</span>
+    </a>
 
-<select id="jenis">
-  <option value="Pemasukan">Pemasukan</option>
-  <option value="Pengeluaran">Pengeluaran</option>
-</select>
-
-<!-- AUTOCOMPLETE BARANG -->
-<input list="daftarBarang" id="keterangan" placeholder="Nama Barang">
-<datalist id="daftarBarang"></datalist>
-
-<input type="number" id="qty" placeholder="Jumlah">
-
-<!-- KHUSUS PENGELUARAN -->
-<div id="hargaWrapper">
-  <input type="number" id="harga" placeholder="Harga">
+    <a href="keuangan.html" class="active">
+      <svg viewBox="0 0 24 24">
+        <rect x="4" y="3" width="16" height="18" rx="2"/>
+        <path d="M8 7h8M8 11h8M8 15h5"/>
+      </svg>
+      <span>Input Transaksi</span>
+    </a>
+  </div>
 </div>
 
-<!-- KHUSUS PEMASUKAN -->
-<div id="pemasukanExtra" style="display:none;">
-  <input type="number" id="hargaModal" placeholder="Harga Modal (otomatis, bisa diubah)">
-  <input type="number" id="hargaJual" placeholder="Harga Jual">
-</div>
+<!-- ===== FORM INPUT TRANSAKSI ===== -->
+<div class="card">
+  <h3>Input Transaksi</h3>
 
-<button onclick="simpan()">Simpan</button>
+  <input type="date" id="tanggal">
+
+  <select id="jenis">
+    <option value="Pemasukan">Pemasukan</option>
+    <option value="Pengeluaran">Pengeluaran</option>
+  </select>
+
+  <input list="daftarBarang" id="keterangan" placeholder="Nama Barang">
+  <datalist id="daftarBarang"></datalist>
+
+  <input type="number" id="qty" placeholder="Jumlah">
+
+  <div id="hargaWrapper">
+    <input type="number" id="harga" placeholder="Harga">
+  </div>
+
+  <div id="pemasukanExtra" style="display:none;">
+    <input type="number" id="hargaModal" placeholder="Harga Modal">
+    <input type="number" id="hargaJual" placeholder="Harga Jual">
+  </div>
+
+  <button onclick="simpan()">Simpan</button>
+</div>
 
 <script>
-// ================== KONFIG ==================
-const API_URL = "https://script.google.com/macros/s/AKfycbz3XTARB3Vd1pANXA5MZ1KqbquHLRC4eO3K6uZENRxfjtvnE1Nb7gv0AHEkxqDxyejGtA/exec";
+const API_URL="https://script.google.com/macros/s/AKfycbz3XTARB3Vd1pANXA5MZ1KqbquHLRC4eO3K6uZENRxfjtvnE1Nb7gv0AHEkxqDxyejGtA/exec";
 
-// ================== DOM ==================
-const tanggal        = document.getElementById("tanggal");
-const jenis          = document.getElementById("jenis");
-const keterangan     = document.getElementById("keterangan");
-const qty            = document.getElementById("qty");
-const harga          = document.getElementById("harga");
-const hargaModal     = document.getElementById("hargaModal");
-const hargaJual      = document.getElementById("hargaJual");
-const pemasukanExtra = document.getElementById("pemasukanExtra");
-const hargaWrapper   = document.getElementById("hargaWrapper");
-const daftarBarang   = document.getElementById("daftarBarang");
+const tanggal=document.getElementById("tanggal");
+const jenis=document.getElementById("jenis");
+const keterangan=document.getElementById("keterangan");
+const qty=document.getElementById("qty");
+const harga=document.getElementById("harga");
+const hargaModal=document.getElementById("hargaModal");
+const hargaJual=document.getElementById("hargaJual");
+const pemasukanExtra=document.getElementById("pemasukanExtra");
+const hargaWrapper=document.getElementById("hargaWrapper");
+const daftarBarang=document.getElementById("daftarBarang");
 
-// ================== TANGGAL DEFAULT ==================
-const today = new Date().toISOString().split("T")[0];
-tanggal.value = today;
+tanggal.value=new Date().toISOString().split("T")[0];
 
-// ================== TOGGLE FORM ==================
-jenis.addEventListener("change", () => {
-  if (jenis.value === "Pemasukan") {
-    pemasukanExtra.style.display = "block";
-    hargaWrapper.style.display = "none";
-    harga.value = "";
-  } else {
-    pemasukanExtra.style.display = "none";
-    hargaWrapper.style.display = "block";
-    hargaModal.value = "";
-    hargaJual.value = "";
+jenis.onchange=()=>{
+  if(jenis.value==="Pemasukan"){
+    pemasukanExtra.style.display="block";
+    hargaWrapper.style.display="none";
+  }else{
+    pemasukanExtra.style.display="none";
+    hargaWrapper.style.display="block";
   }
-});
+};
 jenis.dispatchEvent(new Event("change"));
 
-// ================== LOAD BARANG ==================
-let BARANG = [];
-
-fetch(API_URL + "?action=barang")
-  .then(res => res.json())
-  .then(data => {
-    BARANG = data || [];
-    daftarBarang.innerHTML = "";
-    BARANG.forEach(item => {
-      const opt = document.createElement("option");
-      opt.value = item.nama;
-      daftarBarang.appendChild(opt);
-    });
-  })
-  .catch(err => console.error("Gagal load barang", err));
-
-// ================== AUTO ISI HARGA ==================
-keterangan.addEventListener("input", () => {
-  const item = BARANG.find(b => b.nama === keterangan.value);
-  if (!item) return;
-
-  if (jenis.value === "Pemasukan") {
-    hargaModal.value = item.modal ?? "";
-    hargaJual.value  = item.jual  ?? "";
-  }
+let BARANG=[];
+fetch(API_URL+"?action=barang")
+.then(r=>r.json())
+.then(d=>{
+  BARANG=d||[];
+  daftarBarang.innerHTML="";
+  BARANG.forEach(b=>{
+    const o=document.createElement("option");
+    o.value=b.nama;
+    daftarBarang.appendChild(o);
+  });
 });
 
-// ================== SIMPAN ==================
-function simpan() {
-  if (!keterangan.value || !qty.value) {
-    alert("Nama barang dan jumlah wajib diisi");
-    return;
+keterangan.oninput=()=>{
+  const b=BARANG.find(x=>x.nama===keterangan.value);
+  if(b && jenis.value==="Pemasukan"){
+    hargaModal.value=b.modal||"";
+    hargaJual.value=b.jual||"";
   }
+};
 
-  const params = new URLSearchParams();
-  params.append("tanggal", tanggal.value);
-  params.append("jenis", jenis.value);
-  params.append("keterangan", keterangan.value);
-  params.append("qty", qty.value);
-  params.append("harga", harga.value || 0);
-  params.append("harga_modal", hargaModal.value || 0);
-  params.append("harga_jual", hargaJual.value || 0);
+function simpan(){
+  const p=new URLSearchParams();
+  p.append("tanggal",tanggal.value);
+  p.append("jenis",jenis.value);
+  p.append("keterangan",keterangan.value);
+  p.append("qty",qty.value);
+  p.append("harga",harga.value||0);
+  p.append("harga_modal",hargaModal.value||0);
+  p.append("harga_jual",hargaJual.value||0);
 
-  fetch(API_URL, {
-    method: "POST",
-    body: params
-  })
-  .then(() => {
-    alert("✅ Data berhasil disimpan");
-    document.querySelectorAll("input").forEach(i => i.value = "");
-    tanggal.value = today;
-    jenis.dispatchEvent(new Event("change"));
-  })
-  .catch(err => {
-    alert("❌ Gagal menyimpan data");
-    console.error(err);
-  });
+  fetch(API_URL,{method:"POST",body:p})
+  .then(()=>alert("Data tersimpan"))
+  .catch(()=>alert("Gagal menyimpan"));
 }
 </script>
 
