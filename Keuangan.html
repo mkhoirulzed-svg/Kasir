@@ -40,29 +40,27 @@ button {
 <button onclick="simpan()">Simpan</button>
 
 <script>
-const API_URL = "https://script.google.com/macros/s/AKfycbyHI24gsVMD3ycm_qulWY_45IPPSZ4DohKNk8fX1pWZrzHpgOK6hWLLYz_qFihdGWcr2g/exec";
+const API_URL = "https://script.google.com/macros/s/AKfycbz3XTARB3Vd1pANXA5MZ1KqbquHLRC4eO3K6uZENRxfjtvnE1Nb7gv0AHEkxqDxyejGtA/exec";
 
 function simpan() {
+  const params = new URLSearchParams();
+  params.append("tanggal", tanggal.value);
+  params.append("jenis", jenis.value);
+  params.append("keterangan", keterangan.value);
+  params.append("qty", qty.value);
+  params.append("harga", harga.value);
+
   fetch(API_URL, {
     method: "POST",
-    mode: "no-cors",
-    headers: {
-      "Content-Type": "application/json"
-    },
-    body: JSON.stringify({
-      tanggal: tanggal.value,
-      jenis: jenis.value,
-      keterangan: keterangan.value,
-      qty: qty.value,
-      harga: harga.value
-    })
+    body: params
   })
   .then(() => {
-    alert("Data terkirim");
+    alert("Data berhasil disimpan");
     document.querySelectorAll("input").forEach(i => i.value = "");
   })
   .catch(err => {
-    alert("Gagal: " + err);
+    alert("Gagal menyimpan");
+    console.error(err);
   });
 }
 </script>
