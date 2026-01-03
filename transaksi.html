@@ -175,6 +175,11 @@ th{
     <strong id="rekapPengeluaran">Rp 0</strong>
   </div>
 
+  <div class="rekap-item total">
+  <span>Saldo Saat Ini</span>
+  <strong id="rekapSaldo">Rp 0</strong>
+</div>
+
   <div class="rekap-item">
     <span>Laba Bulan Ini</span>
     <strong id="rekapLaba">Rp 0</strong>
@@ -234,10 +239,10 @@ function loadRekap() {
 
       document.getElementById("rekapLaba").innerText =
         "Rp " + Number(d.laba_bulan_ini).toLocaleString();
-
-      const saldo = d.pemasukan_bulan_ini - d.pengeluaran_bulan_ini;
+      
       document.getElementById("rekapSaldo").innerText =
-        "Rp " + saldo.toLocaleString();
+  "Rp " + Number(d.saldo_saat_ini).toLocaleString();
+      
     });
 }
 
