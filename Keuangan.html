@@ -113,6 +113,20 @@ button{
   border:none;
   font-weight:600;
 }
+
+  .iframe-wrap{
+  width:100%;
+  background:#fff;
+  border-radius:12px;
+  overflow:hidden;
+}
+
+#iframePesanan{
+  width:100%;
+  border:none;
+  min-height:400px;
+}
+
 </style>
 </head>
 
@@ -190,11 +204,10 @@ button{
 </div>
 
 <!-- ===== INPUT PESANAN (IFRAME) ===== -->
-<div class="card" id="contentPesanan" style="display:none;padding:0">
-  <iframe src="pesanan.html"
-    style="width:100%;height:75vh;border:none;border-radius:12px">
-  </iframe>
+<div class="iframe-wrap">
+  <iframe id="iframePesanan" src="pesanan.html"></iframe>
 </div>
+
 
 <script>
 const API_URL="https://script.google.com/macros/s/AKfycbz3XTARB3Vd1pANXA5MZ1KqbquHLRC4eO3K6uZENRxfjtvnE1Nb7gv0AHEkxqDxyejGtA/exec";
