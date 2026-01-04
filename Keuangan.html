@@ -11,12 +11,12 @@
 
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Input Transaksi - Alkes PKY</title>
+<title>Input - Alkes PKY</title>
 
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600&display=swap">
 
 <style>
-/* ===== GLOBAL (SAMA DENGAN INDEX) ===== */
+/* ===== GLOBAL ===== */
 body{
   margin:0;
   font-family:'Inter',sans-serif;
@@ -25,7 +25,7 @@ body{
   padding-top:120px;
 }
 
-/* ===== APP HEADER (SAMA PERSIS) ===== */
+/* ===== HEADER ===== */
 .app-header{
   position:fixed;
   top:0;left:0;right:0;
@@ -44,8 +44,8 @@ body{
   color:#1a56db;
   margin-bottom:6px;
 }
-.app-brand img{ height:32px; }
-.app-menu{ display:flex; }
+.app-brand img{height:32px}
+.app-menu{display:flex}
 .app-menu a{
   flex:1;
   padding:10px 0;
@@ -69,13 +69,36 @@ body{
   border-bottom:3px solid #1a56db;
 }
 
-/* ===== FORM KEUANGAN ===== */
+/* ===== CARD ===== */
 .card{
   background:#fff;
   padding:15px;
   border-radius:12px;
   box-shadow:0 3px 10px rgba(0,0,0,.1);
+  margin-bottom:15px;
 }
+
+/* ===== TAB ===== */
+.tab-wrap{
+  display:flex;
+  overflow:hidden;
+  padding:0;
+}
+.tab{
+  flex:1;
+  padding:12px;
+  border:none;
+  background:#f1f5ff;
+  font-weight:600;
+  color:#64748b;
+  cursor:pointer;
+}
+.tab.active{
+  background:#1a56db;
+  color:#fff;
+}
+
+/* ===== FORM ===== */
 input,select,button{
   width:100%;
   padding:12px;
@@ -95,10 +118,10 @@ button{
 
 <body>
 
-<!-- ===== HEADER + MENU (SAMA) ===== -->
+<!-- ===== HEADER ===== -->
 <div class="app-header">
   <div class="app-brand">
-    <img src="logo.png" alt="Logo">
+    <img src="logo.png">
     <span>Kasir Alkes PKY</span>
   </div>
 
@@ -107,13 +130,11 @@ button{
       <svg viewBox="0 0 24 24">
         <rect x="3" y="4" width="18" height="6" rx="2"/>
         <path d="M4 10h16l-1.5 8a2 2 0 0 1-2 1.6H7.5a2 2 0 0 1-2-1.6L4 10Z"/>
-        <circle cx="9" cy="21" r="1"/>
-        <circle cx="15" cy="21" r="1"/>
       </svg>
       <span>Kasir</span>
     </a>
 
-    <a href="Keuangan.html" class="active">
+    <a href="keuangan.html" class="active">
       <svg viewBox="0 0 24 24">
         <rect x="4" y="3" width="16" height="18" rx="2"/>
         <path d="M8 7h8M8 11h8M8 15h5"/>
@@ -130,8 +151,18 @@ button{
   </div>
 </div>
 
-<!-- ===== FORM INPUT TRANSAKSI ===== -->
-<div class="card">
+<!-- ===== TAB ===== -->
+<div class="card tab-wrap">
+  <button id="tabTransaksi" class="tab active" onclick="showTab('transaksi')">
+    Input Transaksi
+  </button>
+  <button id="tabPesanan" class="tab" onclick="showTab('pesanan')">
+    Input Pesanan
+  </button>
+</div>
+
+<!-- ===== INPUT TRANSAKSI ===== -->
+<div class="card" id="contentTransaksi">
   <h3>Input Transaksi</h3>
 
   <input type="date" id="tanggal">
@@ -156,6 +187,13 @@ button{
   </div>
 
   <button onclick="simpan()">Simpan</button>
+</div>
+
+<!-- ===== INPUT PESANAN (IFRAME) ===== -->
+<div class="card" id="contentPesanan" style="display:none;padding:0">
+  <iframe src="pesanan.html"
+    style="width:100%;height:75vh;border:none;border-radius:12px">
+  </iframe>
 </div>
 
 <script>
@@ -217,8 +255,28 @@ function simpan(){
   p.append("harga_jual",hargaJual.value||0);
 
   fetch(API_URL,{method:"POST",body:p})
-  .then(()=>alert("Data tersimpan"))
-  .catch(()=>alert("Gagal menyimpan"));
+    .then(()=>alert("Data tersimpan"))
+    .catch(()=>alert("Gagal menyimpan"));
+}
+
+/* ===== TAB LOGIC ===== */
+function showTab(tab){
+  const t=document.getElementById("tabTransaksi");
+  const p=document.getElementById("tabPesanan");
+  const ct=document.getElementById("contentTransaksi");
+  const cp=document.getElementById("contentPesanan");
+
+  if(tab==="transaksi"){
+    t.classList.add("active");
+    p.classList.remove("active");
+    ct.style.display="block";
+    cp.style.display="none";
+  }else{
+    t.classList.remove("active");
+    p.classList.add("active");
+    ct.style.display="none";
+    cp.style.display="block";
+  }
 }
 </script>
 
