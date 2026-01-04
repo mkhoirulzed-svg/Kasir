@@ -278,6 +278,11 @@ function showTab(tab){
     cp.style.display="block";
   }
 }
+
+  if (window !== window.top) {
+  document.querySelector(".app-header")?.remove();
+  document.body.style.paddingTop="15px";
+}
 </script>
 
 </body>
