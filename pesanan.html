@@ -17,15 +17,14 @@
 <style>
 /* ===== GLOBAL ===== */
 body{
-  margin:0;
-  font-family:'Inter',sans-serif;
-  background:#e9f2ff;
-  padding:15px;
-margin: 0;
-  padding-top: 90px; /* lebih besar sedikit dari tinggi header */
-  overflow-x: hidden; /* ⬅️ PENTING */
-}
+  margin: 0;
+  font-family: 'Inter', sans-serif;
+  background: #e9f2ff;
 
+  /* ruang untuk header fixed */
+  padding-top: calc(104px + env(safe-area-inset-top));
+  overflow-x: hidden;
+}
 
 /* ===== HEADER ===== */
 .app-header {
@@ -36,11 +35,9 @@ margin: 0;
 
   background: #ffffff;
   z-index: 1000;
-
-  /* ⬇️ penting untuk mobile */
   padding-top: env(safe-area-inset-top);
+  box-shadow: 0 1px 6px rgba(0,0,0,.08);
 }
-
 
 .app-brand{
   height: 48px;
@@ -51,83 +48,115 @@ margin: 0;
   font-weight: 600;
 }
 
-.app-brand img{height:32px}
-.app-menu{
-  display:flex;
+.app-brand img{
+  height: 32px;
 }
-.app-menu a{
+
+/* ===== MENU ===== */
+.app-menu{
   display: flex;
-  justify-content: space-around;
+  width: 100%;
+  border-top: 1px solid #e5e7eb;
+}
+
+.app-menu a{
+  flex: 1;
+  display: flex;
+  flex-direction: column;
   align-items: center;
+  justify-content: center;
 
   height: 56px;
-  border-top: 1px solid #eee;
+  gap: 4px;
+
+  color: #64748b;
+  text-decoration: none;
+  font-size: 12px;
 }
 
 .app-menu a svg{
-  width:20px;height:20px;
-  stroke:currentColor;
-  fill:none;
-  stroke-width:2;
-}
-.app-menu a.active{
-  color:#1a56db;
-  border-bottom:3px solid #1a56db;
+  width: 20px;
+  height: 20px;
+  stroke: currentColor;
+  fill: none;
+  stroke-width: 2;
 }
 
-  
+.app-menu a.active{
+  color: #1a56db;
+  font-weight: 600;
+  position: relative;
+}
+
+.app-menu a.active::after{
+  content: "";
+  position: absolute;
+  bottom: 0;
+  width: 24px;
+  height: 3px;
+  background: #1a56db;
+  border-radius: 3px;
+}
+
 /* ===== CARD ===== */
 .card{
-  background:#fff;
-  padding:15px;
-  border-radius:12px;
-  box-shadow:0 3px 10px rgba(0,0,0,.1);
-  margin-bottom:15px;
+  background: #fff;
+  padding: 15px;
+  border-radius: 12px;
+  box-shadow: 0 3px 10px rgba(0,0,0,.1);
+  margin: 15px;
 }
+
 .card h3{
-  margin:0 0 12px;
-  color:#1a56db;
+  margin: 0 0 12px;
+  color: #1a56db;
 }
 
 /* ===== FORM ===== */
 input, select, button{
-  width:100%;
-  padding:10px;
-  border-radius:8px;
-  border:1px solid #e5e7eb;
-  font-size:14px;
-  margin-bottom:10px;
+  width: 100%;
+  padding: 10px;
+  border-radius: 8px;
+  border: 1px solid #e5e7eb;
+  font-size: 14px;
+  margin-bottom: 10px;
 }
+
 input[readonly]{
-  background:#f1f5f9;
+  background: #f1f5f9;
 }
+
 button{
-  background:#1a56db;
-  color:#fff;
-  font-weight:600;
-  border:none;
+  background: #1a56db;
+  color: #fff;
+  font-weight: 600;
+  border: none;
 }
+
 button:active{
-  transform:scale(.98);
+  transform: scale(.98);
 }
 
 /* ===== TABLE ===== */
 table{
-  width:100%;
-  border-collapse:collapse;
-  font-size:14px;
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 14px;
 }
-th,td{
-  padding:8px 6px;
-  border-bottom:1px solid #e5e7eb;
+
+th, td{
+  padding: 8px 6px;
+  border-bottom: 1px solid #e5e7eb;
 }
+
 th{
-  background:#f1f5ff;
-  color:#1a56db;
-  text-align:left;
+  background: #f1f5ff;
+  color: #1a56db;
+  text-align: left;
 }
-.badge-lunas{color:#16a34a;font-weight:600}
-.badge-belum{color:#dc2626;font-weight:600}
+
+.badge-lunas{ color:#16a34a; font-weight:600 }
+.badge-belum{ color:#dc2626; font-weight:600 }
 
 .row-belum-lunas { background:#fee2e2; }
 .row-lunas { background:#dcfce7; }
