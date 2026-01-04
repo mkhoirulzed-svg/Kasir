@@ -68,6 +68,7 @@ body{
   border-bottom:3px solid #1a56db;
 }
 
+  
 /* ===== CARD ===== */
 .card{
   background:#fff;
@@ -120,6 +121,12 @@ th{
 }
 .badge-lunas{color:#16a34a;font-weight:600}
 .badge-belum{color:#dc2626;font-weight:600}
+
+.row-belum-lunas { background:#fee2e2; }
+.row-lunas { background:#dcfce7; }
+.row-belum { background:#fef9c3; }
+.row-selesai { background:#e5e7eb; }
+
 </style>
 </head>
 
@@ -164,7 +171,17 @@ th{
   <input type="date" id="tanggal">
   <input type="text" id="nama" placeholder="Nama Pemesan">
 
-  <select id="barang" onchange="isiHarga()"></select>
+ <div style="position:relative">
+  <input type="text" id="barang" placeholder="Cari nama barang..."
+    oninput="filterBarang()" autocomplete="off">
+  <div id="suggestBarang"
+       style="position:absolute;top:100%;left:0;right:0;
+              background:#fff;border:1px solid #e5e7eb;
+              max-height:180px;overflow:auto;display:none;
+              z-index:99;border-radius:8px">
+  </div>
+</div>
+
   <input type="number" id="harga" readonly placeholder="Harga Barang">
 
   <select id="status">
@@ -248,7 +265,15 @@ function loadPesanan(){
       listPesanan.innerHTML="";
       d.forEach(p=>{
         listPesanan.innerHTML+=`
-        <tr>
+       
+       const rowClass =
+  p.status === "Belum" ? "row-belum-lunas" :
+  p.keterangan === "Selesai" ? "row-selesai" :
+  p.status === "Lunas" ? "row-lunas" : "";
+
+listPesanan.innerHTML += `
+<tr class="${rowClass}">
+
           <td>${p.tanggal}</td>
           <td>${p.nama}</td>
           <td>${p.barang}</td>
@@ -280,6 +305,51 @@ function updatePesanan(row,status,ket){
 
 loadBarang();
 loadPesanan();
+
+  let dataBarang = [];
+
+function loadBarang(){
+  fetch(API_URL+"?action=barang")
+    .then(r=>r.json())
+    .then(d=>{
+      dataBarang = d;
+    });
+}
+
+function filterBarang(){
+  const q = barang.value.toLowerCase();
+  const box = document.getElementById("suggestBarang");
+  box.innerHTML = "";
+
+  if (!q) {
+    box.style.display = "none";
+    return;
+  }
+
+  const hasil = dataBarang.filter(b =>
+    b.nama.toLowerCase().includes(q)
+  );
+
+  hasil.forEach(b=>{
+    const div = document.createElement("div");
+    div.style.padding="8px";
+    div.style.cursor="pointer";
+    div.innerText = b.nama;
+
+    div.onclick = () => pilihBarang(b);
+
+    box.appendChild(div);
+  });
+
+  box.style.display = hasil.length ? "block" : "none";
+}
+
+function pilihBarang(b){
+  barang.value = b.nama;
+  harga.value = b.jual;
+  document.getElementById("suggestBarang").style.display = "none";
+}
+
 </script>
 
 </body>
