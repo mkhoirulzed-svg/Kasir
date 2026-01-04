@@ -126,21 +126,14 @@ th{
 .row-lunas { background:#dcfce7; }
 .row-belum { background:#fef9c3; }
 .row-selesai { background:#e5e7eb; }
+.header-spacer {
+  height: 100px; /* sama dengan tinggi header */
+}
 
 </style>
 </head>
 
 <body>
-<script>
-document.addEventListener("DOMContentLoaded", () => {
-  if (window !== window.top) {
-    const header = document.querySelector(".app-header");
-    if (header) header.remove();
-
-    document.body.style.paddingTop = "15px";
-  }
-});
-</script>
 
 <!-- ===== HEADER ===== -->
 <div class="app-header">
@@ -161,6 +154,9 @@ document.addEventListener("DOMContentLoaded", () => {
       </svg>
       <span>Kasir</span>
     </a>
+
+
+<div class="header-spacer"></div>
 
     <!-- INPUT / KEUANGAN -->
     <a href="Keuangan.html">
