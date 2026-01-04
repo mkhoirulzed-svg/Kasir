@@ -114,19 +114,18 @@ button{
   font-weight:600;
 }
 
-  .iframe-wrap{
+/* ===== IFRAME ===== */
+.iframe-wrap{
   width:100%;
   background:#fff;
   border-radius:12px;
   overflow:hidden;
 }
-
 #iframePesanan{
   width:100%;
   border:none;
   min-height:400px;
 }
-
 </style>
 </head>
 
@@ -203,11 +202,12 @@ button{
   <button onclick="simpan()">Simpan</button>
 </div>
 
-<!-- ===== INPUT PESANAN (IFRAME) ===== -->
-<div class="iframe-wrap">
-  <iframe id="iframePesanan" src="pesanan.html"></iframe>
+<!-- ===== INPUT PESANAN ===== -->
+<div class="card" id="contentPesanan" style="display:none;padding:0">
+  <div class="iframe-wrap">
+    <iframe id="iframePesanan" src="pesanan.html"></iframe>
+  </div>
 </div>
-
 
 <script>
 const API_URL="https://script.google.com/macros/s/AKfycbz3XTARB3Vd1pANXA5MZ1KqbquHLRC4eO3K6uZENRxfjtvnE1Nb7gv0AHEkxqDxyejGtA/exec";
@@ -289,24 +289,23 @@ function showTab(tab){
     p.classList.add("active");
     ct.style.display="none";
     cp.style.display="block";
+    resizeIframe();
   }
 }
 
-  if (window !== window.top) {
-  document.querySelector(".app-header")?.remove();
-  document.body.style.paddingTop="15px";
+function resizeIframe(){
+  const iframe=document.getElementById("iframePesanan");
+  if(!iframe) return;
+
+  iframe.onload = () => {
+    try{
+      const h=iframe.contentWindow.document.body.scrollHeight;
+      iframe.style.height = h + "px";
+    }catch(e){
+      iframe.style.height = "80vh";
+    }
+  };
 }
-
-  const iframe = document.getElementById("iframePesanan");
-
-iframe.onload = () => {
-  try {
-    const h = iframe.contentWindow.document.body.scrollHeight;
-    iframe.style.height = h + "px";
-  } catch (e) {
-    iframe.style.height = "80vh"; // fallback
-  }
-};
 </script>
 
 </body>
