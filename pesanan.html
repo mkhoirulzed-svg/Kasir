@@ -185,14 +185,17 @@ th{
   <input type="number" id="harga" readonly placeholder="Harga Barang">
 
   <select id="status">
+    <option disabled selected>Status Pembayaran</option>
     <option>Belum</option>
     <option>Lunas</option>
   </select>
 
-  <select id="keterangan">
-    <option>Belum</option>
-    <option>Selesai</option>
-  </select>
+ <select id="keterangan">
+  <option disabled selected>Proses Pesanan</option>
+  <option>Belum</option>
+  <option>Selesai</option>
+</select>
+
 
   <button onclick="kirimPesanan()">Kirim Pesanan</button>
 </div>
@@ -208,7 +211,7 @@ th{
         <th>Nama</th>
         <th>Barang</th>
         <th>Pembayaran</th>
-        <th>Keterangan</th>
+        <th>Proses Pesanan</th>
       </tr>
     </thead>
     <tbody id="listPesanan"></tbody>
