@@ -298,14 +298,13 @@ function kirimPesanan(){
 
   const d = new Date(tgl);
 
-  return d.toLocaleString("id-ID", {
-    day: "2-digit",
-    month: "2-digit",
-    year: "numeric",
-    hour: "2-digit",
-    minute: "2-digit"
-  });
+  const day   = d.getDate();          // 4
+  const month = d.getMonth() + 1;     // 1
+  const year  = d.getFullYear() % 100; // 26
+
+  return `${day}/${month}/${year}`;
 }
+
 
 // =======================
 // LOAD PESANAN + HIGHLIGHT
