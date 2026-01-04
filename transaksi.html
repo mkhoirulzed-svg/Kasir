@@ -121,6 +121,44 @@ th{
 .rekap-item.total strong {
   color:#1a56db;
 }
+
+/* ===== TABLE WRAPPER (KUNCI UTAMA) ===== */
+.table-wrap{
+  width: 100%;
+  max-width: 100%;
+  overflow-x: auto;   /* scroll ke samping */
+  overflow-y: auto;   /* scroll ke bawah */
+  -webkit-overflow-scrolling: touch;
+
+  border-radius: 10px;
+}
+
+/* ===== TABLE ===== */
+.table-wrap table{
+  width: 100%;
+  min-width: 600px;   /* ⬅️ INI KUNCI: paksa kolom tidak remuk */
+  border-collapse: collapse;
+  font-size: 14px;
+}
+
+/* ===== CELL ===== */
+.table-wrap th,
+.table-wrap td{
+  padding: 8px 6px;
+  border-bottom: 1px solid #e5e7eb;
+  white-space: nowrap;  /* teks tidak memaksa wrap */
+  text-align: left;
+}
+
+/* ===== HEADER TABLE ===== */
+.table-wrap th{
+  position: sticky;
+  top: 0;
+  background: #f1f5ff;
+  color: #1a56db;
+  z-index: 2;
+}
+
 </style>
 </head>
 
@@ -203,7 +241,7 @@ th{
 <!-- ===== DATA TRANSAKSI ===== -->
 <div class="card">
   <h3>Transaksi Terakhir</h3>
-
+<div class="table-wrap">
   <table>
     <thead>
       <tr>
@@ -217,7 +255,7 @@ th{
     <tbody id="listTransaksi"></tbody>
   </table>
 </div>
-
+</div>
 <script>
 const API_URL="https://script.google.com/macros/s/AKfycbz3XTARB3Vd1pANXA5MZ1KqbquHLRC4eO3K6uZENRxfjtvnE1Nb7gv0AHEkxqDxyejGtA/exec";
 
