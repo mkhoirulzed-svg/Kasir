@@ -219,94 +219,13 @@ th{
 const API_URL="https://script.google.com/macros/s/AKfycbz3XTARB3Vd1pANXA5MZ1KqbquHLRC4eO3K6uZENRxfjtvnE1Nb7gv0AHEkxqDxyejGtA/exec";
 
 // tanggal default hari ini
-tanggal.value=new Date().toISOString().split("T")[0];
+document.getElementById("tanggal").value =
+  new Date().toISOString().split("T")[0];
 
-function loadBarang(){
-  fetch(API_URL+"?action=barang")
-    .then(r=>r.json())
-    .then(d=>{
-      barang.innerHTML="";
-      d.forEach(b=>{
-        barang.innerHTML+=`
-          <option value="${b.nama}" data-harga="${b.jual}">
-            ${b.nama}
-          </option>`;
-      });
-      isiHarga();
-    });
-}
-
-function isiHarga(){
-  harga.value=barang.selectedOptions[0].dataset.harga;
-}
-
-function kirimPesanan(){
-  const f=new FormData();
-  f.append("action","simpan_pesanan");
-  f.append("tanggal",tanggal.value);
-  f.append("nama",nama.value);
-  f.append("barang",barang.value);
-  f.append("harga",harga.value);
-  f.append("status",status.value);
-  f.append("keterangan",keterangan.value);
-
-  fetch(API_URL,{method:"POST",body:f})
-    .then(()=>{
-      loadPesanan();
-      nama.value="";
-      alert("Pesanan tersimpan");
-    });
-}
-
-function loadPesanan(){
-  fetch(API_URL+"?action=pesanan")
-    .then(r=>r.json())
-    .then(d=>{
-      listPesanan.innerHTML="";
-      d.forEach(p=>{
-        listPesanan.innerHTML+=`
-       
-       const rowClass =
-  p.status === "Belum" ? "row-belum-lunas" :
-  p.keterangan === "Selesai" ? "row-selesai" :
-  p.status === "Lunas" ? "row-lunas" : "";
-
-listPesanan.innerHTML += `
-<tr class="${rowClass}">
-
-          <td>${p.tanggal}</td>
-          <td>${p.nama}</td>
-          <td>${p.barang}</td>
-          <td>
-            <select onchange="updatePesanan(${p.row},this.value,'${p.keterangan}')">
-              <option ${p.status=="Belum"?"selected":""}>Belum</option>
-              <option ${p.status=="Lunas"?"selected":""}>Lunas</option>
-            </select>
-          </td>
-          <td>
-            <select onchange="updatePesanan(${p.row},'${p.status}',this.value)">
-              <option ${p.keterangan=="Belum"?"selected":""}>Belum</option>
-              <option ${p.keterangan=="Selesai"?"selected":""}>Selesai</option>
-            </select>
-          </td>
-        </tr>`;
-      });
-    });
-}
-
-function updatePesanan(row,status,ket){
-  const f=new FormData();
-  f.append("action","update_pesanan");
-  f.append("row",row);
-  f.append("status",status);
-  f.append("keterangan",ket);
-  fetch(API_URL,{method:"POST",body:f});
-}
-
-loadBarang();
-loadPesanan();
-
-  let dataBarang = [];
+// =======================
+// AUTOCOMPLETE BARANG
+// =======================
+let dataBarang = [];
 
 function loadBarang(){
   fetch(API_URL+"?action=barang")
@@ -336,7 +255,11 @@ function filterBarang(){
     div.style.cursor="pointer";
     div.innerText = b.nama;
 
-    div.onclick = () => pilihBarang(b);
+    div.onclick = () => {
+      barang.value = b.nama;
+      harga.value = b.jual;
+      box.style.display = "none";
+    };
 
     box.appendChild(div);
   });
@@ -344,13 +267,80 @@ function filterBarang(){
   box.style.display = hasil.length ? "block" : "none";
 }
 
-function pilihBarang(b){
-  barang.value = b.nama;
-  harga.value = b.jual;
-  document.getElementById("suggestBarang").style.display = "none";
+// =======================
+// SIMPAN PESANAN
+// =======================
+function kirimPesanan(){
+  const f=new FormData();
+  f.append("action","simpan_pesanan");
+  f.append("tanggal",tanggal.value);
+  f.append("nama",nama.value);
+  f.append("barang",barang.value);
+  f.append("harga",harga.value);
+  f.append("status",status.value);
+  f.append("keterangan",keterangan.value);
+
+  fetch(API_URL,{method:"POST",body:f})
+    .then(()=>{
+      loadPesanan();
+      nama.value="";
+      barang.value="";
+      harga.value="";
+      alert("Pesanan tersimpan");
+    });
 }
 
+// =======================
+// LOAD PESANAN + HIGHLIGHT
+// =======================
+function loadPesanan(){
+  fetch(API_URL+"?action=pesanan")
+    .then(r=>r.json())
+    .then(d=>{
+      listPesanan.innerHTML="";
+      d.forEach(p=>{
+
+        let rowClass="";
+        if (p.status==="Belum") rowClass="row-belum-lunas";
+        else if (p.keterangan==="Selesai") rowClass="row-selesai";
+        else if (p.status==="Lunas") rowClass="row-lunas";
+
+        listPesanan.innerHTML+=`
+        <tr class="${rowClass}">
+          <td>${p.tanggal}</td>
+          <td>${p.nama}</td>
+          <td>${p.barang}</td>
+          <td>
+            <select onchange="updatePesanan(${p.row},this.value,'${p.keterangan}')">
+              <option ${p.status=="Belum"?"selected":""}>Belum</option>
+              <option ${p.status=="Lunas"?"selected":""}>Lunas</option>
+            </select>
+          </td>
+          <td>
+            <select onchange="updatePesanan(${p.row},'${p.status}',this.value)">
+              <option ${p.keterangan=="Belum"?"selected":""}>Belum</option>
+              <option ${p.keterangan=="Selesai"?"selected":""}>Selesai</option>
+            </select>
+          </td>
+        </tr>`;
+      });
+    });
+}
+
+function updatePesanan(row,status,ket){
+  const f=new FormData();
+  f.append("action","update_pesanan");
+  f.append("row",row);
+  f.append("status",status);
+  f.append("keterangan",ket);
+  fetch(API_URL,{method:"POST",body:f});
+}
+
+// INIT
+loadBarang();
+loadPesanan();
 </script>
+
 
 </body>
 </html>
