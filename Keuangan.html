@@ -296,6 +296,17 @@ function showTab(tab){
   document.querySelector(".app-header")?.remove();
   document.body.style.paddingTop="15px";
 }
+
+  const iframe = document.getElementById("iframePesanan");
+
+iframe.onload = () => {
+  try {
+    const h = iframe.contentWindow.document.body.scrollHeight;
+    iframe.style.height = h + "px";
+  } catch (e) {
+    iframe.style.height = "80vh"; // fallback
+  }
+};
 </script>
 
 </body>
