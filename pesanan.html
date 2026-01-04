@@ -21,18 +21,23 @@ body{
   font-family:'Inter',sans-serif;
   background:#e9f2ff;
   padding:15px;
+margin: 0;
+  padding-top: 90px; /* lebih besar sedikit dari tinggi header */
+  overflow-x: hidden; /* ⬅️ PENTING */
 }
 
 
 /* ===== HEADER ===== */
-.app-header{
-  position:fixed;
-  top:0;left:0;right:0;
-  background:#fff;
-  padding:10px 12px 0;
-  border-bottom:1px solid #e5e7eb;
-  z-index:1000;
+.app-header {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 80px; /* sesuaikan */
+  background: #fff;
+  z-index: 1000;
 }
+
 .app-brand{
   display:flex;
   align-items:center;
@@ -126,9 +131,6 @@ th{
 .row-lunas { background:#dcfce7; }
 .row-belum { background:#fef9c3; }
 .row-selesai { background:#e5e7eb; }
-.header-spacer {
-  height: 100px; /* sama dengan tinggi header */
-}
 
 </style>
 </head>
@@ -154,9 +156,6 @@ th{
       </svg>
       <span>Kasir</span>
     </a>
-
-
-<div class="header-spacer"></div>
 
     <!-- INPUT / KEUANGAN -->
     <a href="Keuangan.html">
