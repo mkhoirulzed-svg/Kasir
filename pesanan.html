@@ -186,8 +186,8 @@ th{
 
   <select id="status">
     <option disabled selected>Status Pembayaran</option>
-    <option>Belum</option>
-    <option>Lunas</option>
+   <option value="Belum">Belum</option>
+  <option value="Lunas">Lunas</option>
   </select>
 
  <select id="keterangan">
@@ -280,7 +280,7 @@ function kirimPesanan(){
   f.append("nama",nama.value);
   f.append("barang",barang.value);
   f.append("harga",harga.value);
-  f.append("status",status.value);
+ f.append("status", status.value || "Belum");
   f.append("keterangan",keterangan.value);
 
   fetch(API_URL,{method:"POST",body:f})
