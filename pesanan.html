@@ -182,7 +182,11 @@ th{
   </div>
 </div>
 
-  <input type="number" id="harga" readonly placeholder="Harga Barang">
+  <label style="font-size:13px;color:#64748b;display:block;margin-bottom:4px">
+  Harga
+</label>
+<input type="number" id="harga" placeholder="Harga Barang">
+
 
   <select id="status">
     <option disabled selected>Status Pembayaran</option>
@@ -210,7 +214,9 @@ th{
         <th>Tanggal</th>
         <th>Nama</th>
         <th>Barang</th>
-        <th>Pembayaran</th>
+<th>Harga</th>
+<th>Pembayaran</th>
+
         <th>Proses Pesanan</th>
       </tr>
     </thead>
@@ -329,6 +335,7 @@ function loadPesanan(){
           <td>${tglID}</td>
           <td>${p.nama}</td>
           <td>${p.barang}</td>
+          <td>Rp ${Number(p.harga).toLocaleString("id-ID")}</td>
           <td>
             <select onchange="updatePesanan(${p.row},this.value,'${p.keterangan}')">
               <option value="Belum" ${p.status=="Belum"?"selected":""}>Belum</option>
@@ -347,14 +354,16 @@ function loadPesanan(){
 }
 
 
-function updatePesanan(row,status,ket){
+function updatePesanan(row,status,ket,harga){
   const f=new FormData();
   f.append("action","update_pesanan");
   f.append("row",row);
   f.append("status",status);
   f.append("keterangan",ket);
+  f.append("harga",harga);
   fetch(API_URL,{method:"POST",body:f});
 }
+
 
 // INIT
 loadBarang();
