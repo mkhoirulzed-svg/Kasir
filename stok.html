@@ -188,6 +188,8 @@ body{
 </div>
 
 <script>
+const EDIT_PIN = "1234"; // 🔐 ganti PIN di sini
+
 const API_URL="https://script.google.com/macros/s/AKfycbz3XTARB3Vd1pANXA5MZ1KqbquHLRC4eO3K6uZENRxfjtvnE1Nb7gv0AHEkxqDxyejGtA/exec";
 
 const PER_PAGE = 30;
@@ -219,11 +221,25 @@ function filterData(){
 }
 
 function toggleMode(){
-  modeEdit = !modeEdit;
+  // Jika mau MASUK mode edit → minta PIN
+  if(!modeEdit){
+    const pin = prompt("Masukkan PIN untuk Mode Edit:");
+    if(pin !== EDIT_PIN){
+      alert("PIN salah!");
+      return;
+    }
+    modeEdit = true;
+  } 
+  // Jika mau KELUAR mode edit → langsung
+  else {
+    modeEdit = false;
+  }
+
   modeBtn.textContent = modeEdit ? "Mode Lihat" : "Mode Edit";
   modeBtn.style.background = modeEdit ? "#dc2626" : "#16a34a";
   render();
 }
+
 
 function render(){
   const start = (page-1)*PER_PAGE;
@@ -293,8 +309,15 @@ function simpan(row,stok){
   p.append("stok",stok);
 
   fetch(API_URL,{method:"POST",body:p})
-    .then(()=>alert("Stok diperbarui"));
+    .then(()=>{
+      alert("Stok diperbarui");
+      modeEdit = false;                 // ⬅️ keluar otomatis
+      modeBtn.textContent = "Mode Edit";
+      modeBtn.style.background = "#16a34a";
+      render();
+    });
 }
+
 </script>
 
 </body>
