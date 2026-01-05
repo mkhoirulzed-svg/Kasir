@@ -168,22 +168,22 @@ body{
 <!-- ===== LIST STOK ===== -->
 <div class="card">
   <h3>Daftar Stok Barang</h3>
+
   <div style="display:flex; gap:8px; margin-bottom:12px;">
-  <input 
-    type="text" 
-    id="searchBox" 
-    placeholder="Cari barang..." 
-    oninput="filterData()"
-    style="flex:1; padding:8px; border-radius:6px; border:1px solid #ccc;"
-  >
-  <button onclick="toggleMode()" id="modeBtn"
-    style="padding:8px 12px; border-radius:6px; border:none; background:#16a34a; color:#fff;">
-    Mode Edit
-  </button>
-</div>
+    <input 
+      type="text" 
+      id="searchBox" 
+      placeholder="Cari barang..." 
+      oninput="filterData()"
+      style="flex:1; padding:8px; border-radius:6px; border:1px solid #ccc;"
+    >
+    <button onclick="toggleMode()" id="modeBtn"
+      style="padding:8px 12px; border-radius:6px; border:none; background:#16a34a; color:#fff;">
+      Mode Edit
+    </button>
+  </div>
 
   <div id="stokList"></div>
-
   <div class="pagination" id="pagination"></div>
 </div>
 
@@ -192,7 +192,14 @@ const API_URL="https://script.google.com/macros/s/AKfycbz3XTARB3Vd1pANXA5MZ1Kqbq
 
 const PER_PAGE = 30;
 let data = [];
+let filteredData = [];
 let page = 1;
+let modeEdit = false;
+
+const stokList   = document.getElementById("stokList");
+const pagination = document.getElementById("pagination");
+const searchBox  = document.getElementById("searchBox");
+const modeBtn    = document.getElementById("modeBtn");
 
 fetch(API_URL+"?action=stok")
   .then(r=>r.json())
@@ -202,22 +209,21 @@ fetch(API_URL+"?action=stok")
     render();
   });
 
-  function filterData(){
+function filterData(){
   const q = searchBox.value.toLowerCase();
-  filteredData = data.filter(b => 
+  filteredData = data.filter(b =>
     b.nama.toLowerCase().includes(q)
   );
   page = 1;
   render();
 }
 
-  function toggleMode(){
+function toggleMode(){
   modeEdit = !modeEdit;
   modeBtn.textContent = modeEdit ? "Mode Lihat" : "Mode Edit";
   modeBtn.style.background = modeEdit ? "#dc2626" : "#16a34a";
   render();
 }
-
 
 function render(){
   const start = (page-1)*PER_PAGE;
@@ -242,8 +248,7 @@ function render(){
       input.style.background="#f1f5f9";
     }
 
-    row.appendChild(nama);
-    row.appendChild(input);
+    row.append(nama,input);
 
     if(modeEdit){
       const btn=document.createElement("button");
@@ -255,12 +260,12 @@ function render(){
     stokList.appendChild(row);
   });
 
- renderPagination();
+  renderPagination();
 }
 
 function renderPagination(){
   pagination.innerHTML="";
-  const total=Math.ceil(data.length/PER_PAGE);
+  const total = Math.ceil(filteredData.length / PER_PAGE);
 
   const prev=document.createElement("button");
   prev.textContent="Prev";
@@ -294,4 +299,3 @@ function simpan(row,stok){
 
 </body>
 </html>
-
