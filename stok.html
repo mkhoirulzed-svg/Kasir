@@ -168,6 +168,20 @@ body{
 <!-- ===== LIST STOK ===== -->
 <div class="card">
   <h3>Daftar Stok Barang</h3>
+  <div style="display:flex; gap:8px; margin-bottom:12px;">
+  <input 
+    type="text" 
+    id="searchBox" 
+    placeholder="Cari barang..." 
+    oninput="filterData()"
+    style="flex:1; padding:8px; border-radius:6px; border:1px solid #ccc;"
+  >
+  <button onclick="toggleMode()" id="modeBtn"
+    style="padding:8px 12px; border-radius:6px; border:none; background:#16a34a; color:#fff;">
+    Mode Edit
+  </button>
+</div>
+
   <div id="stokList"></div>
 
   <div class="pagination" id="pagination"></div>
@@ -183,17 +197,35 @@ let page = 1;
 fetch(API_URL+"?action=stok")
   .then(r=>r.json())
   .then(d=>{
-    data=d||[];
+    data = d || [];
+    filteredData = data;
     render();
   });
 
+  function filterData(){
+  const q = searchBox.value.toLowerCase();
+  filteredData = data.filter(b => 
+    b.nama.toLowerCase().includes(q)
+  );
+  page = 1;
+  render();
+}
+
+  function toggleMode(){
+  modeEdit = !modeEdit;
+  modeBtn.textContent = modeEdit ? "Mode Lihat" : "Mode Edit";
+  modeBtn.style.background = modeEdit ? "#dc2626" : "#16a34a";
+  render();
+}
+
+
 function render(){
-  const start=(page-1)*PER_PAGE;
-  const end=start+PER_PAGE;
-  const slice=data.slice(start,end);
+  const start = (page-1)*PER_PAGE;
+  const end   = start+PER_PAGE;
+  const slice = filteredData.slice(start,end);
 
   stokList.innerHTML="";
-  slice.forEach((b,i)=>{
+  slice.forEach(b=>{
     const row=document.createElement("div");
     row.className="stok-item";
 
@@ -204,16 +236,26 @@ function render(){
     const input=document.createElement("input");
     input.type="number";
     input.value=b.stok;
+    input.disabled = !modeEdit;
 
-    const btn=document.createElement("button");
-    btn.textContent="Simpan";
-    btn.onclick=()=>simpan(b.row,input.value);
+    if(!modeEdit){
+      input.style.background="#f1f5f9";
+    }
 
-    row.append(nama,input,btn);
+    row.appendChild(nama);
+    row.appendChild(input);
+
+    if(modeEdit){
+      const btn=document.createElement("button");
+      btn.textContent="Simpan";
+      btn.onclick=()=>simpan(b.row,input.value);
+      row.appendChild(btn);
+    }
+
     stokList.appendChild(row);
   });
 
-  renderPagination();
+ const total = Math.ceil(filteredData.length / PER_PAGE);
 }
 
 function renderPagination(){
