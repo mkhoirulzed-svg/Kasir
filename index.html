@@ -233,7 +233,30 @@ td { padding:6px 0; }
 /* === SEMUA SCRIPT KASIR ASLI KAMU UTUH === */
 let database = [];
 let keranjang = [];
-readExcel("data.xlsx", data => { database = data; renderSelect(); });
+    let database = [];
+let keranjang = [];
+
+// 🔗 API Spreadsheet (BARU)
+const API_BARANG = "https://script.google.com/macros/s/AKfycbz3XTARB3Vd1pANXA5MZ1KqbquHLRC4eO3K6uZENRxfjtvnE1Nb7gv0AHEkxqDxyejGtA/exec";
+
+fetch(API_BARANG)
+  .then(res => res.json())
+  .then(data => {
+    database = data;
+    renderSelect();
+  })
+  .catch(err => {
+    alert("Gagal memuat data barang dari server");
+    console.error(err);
+  });
+
+function renderSelect(){
+  listBarang.innerHTML = database.map(b =>
+    `<option value="${b.nama}" data-harga="${b.harga}">
+      ${b.nama} - Rp ${b.harga.toLocaleString()}
+    </option>`
+  ).join("");
+}
 function renderSelect(){ listBarang.innerHTML = database.map(b =>
 `<option value="${b.nama}" data-harga="${b.harga}">${b.nama} - Rp ${b.harga.toLocaleString()}</option>`).join(""); }
 function cariBarang(){
