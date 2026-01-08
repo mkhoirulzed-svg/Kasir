@@ -13,8 +13,6 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Kasir Alkes PKY</title>
 
-<!-- ===== LIBRARY ===== -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600&display=swap">
 
 <style>
@@ -23,11 +21,11 @@ body {
     font-family:'Inter',sans-serif;
     background:#e9f2ff;
     padding:15px;
-    padding-top:120px; /* ruang header */
+    padding-top:120px;
 }
 h2 { text-align:center; color:#1a56db; }
 
-/* ===== APP HEADER ===== */
+/* ===== HEADER ===== */
 .app-header {
     position: fixed;
     top: 0; left: 0; right: 0;
@@ -60,19 +58,12 @@ h2 { text-align:center; color:#1a56db; }
     align-items:center;
     gap:4px;
 }
-.app-menu a svg {
-    width:20px;
-    height:20px;
-    stroke:currentColor;
-    fill:none;
-    stroke-width:2;
-}
 .app-menu a.active {
     color:#1a56db;
     border-bottom:3px solid #1a56db;
 }
 
-/* ===== KASIR STYLE ASLI ===== */
+/* ===== KASIR ===== */
 .card {
     background:#fff;
     padding:15px;
@@ -98,7 +89,6 @@ input,select {
     margin-top:10px;
     background:#1a56db;
     color:#fff;
-    cursor:pointer;
 }
 table { width:100%; font-size:15px; }
 td { padding:6px 0; }
@@ -123,77 +113,24 @@ td { padding:6px 0; }
     background:#f1f5ff;
     color:#1a56db;
     border:1px dashed #1a56db;
-    font-size:15px;
 }
-.manual-box {
-    display:none;
-    margin-top:10px;
-}
+.manual-box { display:none; margin-top:10px; }
 </style>
 </head>
 
 <body>
 
-<!-- ===== HEADER + MENU ===== -->
+<!-- ===== HEADER ===== -->
 <div class="app-header">
   <div class="app-brand">
-    <img src="logo.png" alt="Logo">
+    <img src="logo.png">
     <span>Kasir Alkes PKY</span>
   </div>
-
-  <div class="app-menu">
-
-    <!-- KASIR -->
-    <a href="index.html" class="active">
-      <svg viewBox="0 0 24 24">
-        <rect x="3" y="4" width="18" height="6" rx="2"/>
-        <path d="M4 10h16l-1.5 8a2 2 0 0 1-2 1.6H7.5a2 2 0 0 1-2-1.6L4 10Z"/>
-        <circle cx="9" cy="21" r="1"/>
-        <circle cx="15" cy="21" r="1"/>
-      </svg>
-      <span>Kasir</span>
-    </a>
-
-    <!-- INPUT / KEUANGAN -->
-    <a href="Keuangan.html">
-      <svg viewBox="0 0 24 24">
-        <rect x="4" y="3" width="16" height="18" rx="2"/>
-        <path d="M8 7h8M8 11h8M8 15h5"/>
-      </svg>
-      <span>Input</span>
-    </a>
-
-    <!-- TRANSAKSI -->
-    <a href="transaksi.html">
-      <svg viewBox="0 0 24 24">
-        <path d="M4 6h16M4 12h16M4 18h16"/>
-      </svg>
-      <span>Transaksi</span>
-    </a>
-
-    <!-- PESANAN -->
-    <a href="pesanan.html">
-      <svg viewBox="0 0 24 24">
-        <path d="M6 2h12l2 4v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6l2-4Z"/>
-        <path d="M6 6h12M9 10h6M9 14h6"/>
-      </svg>
-      <span>Pesanan</span>
-    </a>
-<!-- STOK -->
-    <a href="stok.html" >
-      <svg viewBox="0 0 24 24">
-        <path d="M3 7l9-4 9 4-9 4-9-4Z"/>
-        <path d="M3 12l9 4 9-4"/>
-        <path d="M3 17l9 4 9-4"/>
-      </svg>
-      <span>Stok</span>
-    </a>
-    
-  </div>
 </div>
-<!-- ===== INPUT BARANG DATABASE ===== -->
+
+<!-- ===== INPUT BARANG ===== -->
 <div class="card">
-    <input id="search" placeholder="Cari nama / barcode..." oninput="cariBarang()">
+    <input id="search" placeholder="Cari nama barang..." oninput="cariBarang()">
     <select id="listBarang"></select>
     <input id="qty" type="number" value="1" min="1">
     <button class="btn" onclick="tambah()">Tambah ke Keranjang</button>
@@ -227,69 +164,119 @@ td { padding:6px 0; }
     <button class="btn btn-wa" onclick="kirimWA()">Kirim WhatsApp</button>
 </div>
 
-<!-- ===== SCRIPT ASLI (TIDAK DIUBAH) ===== -->
-<script src="excel.js"></script>
+<!-- ===== SCRIPT ===== -->
 <script>
-/* === SEMUA SCRIPT KASIR ASLI KAMU UTUH === */
 let database = [];
 let keranjang = [];
-readExcel("data.xlsx", data => { database = data; renderSelect(); });
-function renderSelect(){ listBarang.innerHTML = database.map(b =>
-`<option value="${b.nama}" data-harga="${b.harga}">${b.nama} - Rp ${b.harga.toLocaleString()}</option>`).join(""); }
+
+/* 🔗 API SPREADSHEET */
+const API_BARANG =
+  "https://script.google.com/macros/s/XXXXX/exec?action=barang_kasir";
+
+/* LOAD DATA BARANG */
+fetch(API_BARANG)
+  .then(res => res.json())
+  .then(data => {
+    database = data;
+    renderSelect();
+  })
+  .catch(() => alert("Gagal load data barang"));
+
+function renderSelect(){
+  listBarang.innerHTML = database.map(b =>
+    `<option value="${b.nama}" data-harga="${b.harga}">
+      ${b.nama} - Rp ${b.harga.toLocaleString()}
+    </option>`
+  ).join("");
+}
+
 function cariBarang(){
-let q = search.value.toLowerCase();
-listBarang.innerHTML = database.filter(b =>
-b.nama.toLowerCase().includes(q) ||
-(b.kode && b.kode.toString().includes(q))
-).map(b =>
-`<option value="${b.nama}" data-harga="${b.harga}">${b.nama} - Rp ${b.harga.toLocaleString()}</option>`).join("");
+  let q = search.value.toLowerCase();
+  listBarang.innerHTML = database
+    .filter(b => b.nama.toLowerCase().includes(q))
+    .map(b =>
+      `<option value="${b.nama}" data-harga="${b.harga}">
+        ${b.nama} - Rp ${b.harga.toLocaleString()}
+      </option>`
+    ).join("");
 }
+
 function tambah(){
-let opt = listBarang.selectedOptions[0];
-keranjang.push({ nama: opt.value, harga: Number(opt.dataset.harga), qty: Number(qty.value) });
-renderKeranjang();
+  let opt = listBarang.selectedOptions[0];
+  keranjang.push({
+    nama: opt.value,
+    harga: Number(opt.dataset.harga),
+    qty: Number(qty.value)
+  });
+  renderKeranjang();
 }
+
 function tambahManual(){
-if(!manualNama.value || !manualHarga.value) return alert("Lengkapi data barang manual");
-keranjang.push({ nama: manualNama.value, harga: Number(manualHarga.value), qty: Number(manualQty.value) });
-manualNama.value=""; manualHarga.value=""; manualQty.value=1; renderKeranjang();
+  if(!manualNama.value || !manualHarga.value)
+    return alert("Lengkapi data barang");
+
+  keranjang.push({
+    nama: manualNama.value,
+    harga: Number(manualHarga.value),
+    qty: Number(manualQty.value)
+  });
+  manualNama.value=""; manualHarga.value=""; manualQty.value=1;
+  renderKeranjang();
 }
+
 function toggleManual(){
-manualBox.style.display = manualBox.style.display==="block" ? "none" : "block";
+  manualBox.style.display =
+    manualBox.style.display==="block" ? "none" : "block";
 }
+
 function renderKeranjang(){
-let total=0;
-keranjangList.innerHTML = keranjang.map((b,i)=>{
-let sub=b.qty*b.harga; total+=sub;
-return `<tr><td><strong>${b.nama}</strong><br>
-Qty <input class="small-input" type="number" value="${b.qty}" onchange="ubahQty(${i},this.value)">
-Harga <input class="small-input" type="number" value="${b.harga}" onchange="ubahHarga(${i},this.value)">
-<button class="btn-danger" onclick="hapusItem(${i})">X</button></td>
-<td class="right">Rp ${sub.toLocaleString()}</td></tr>`;
-}).join("");
-let pot=hitungDiskon(total);
-total.innerText="Rp "+(total-pot).toLocaleString();
+  let total=0;
+  keranjangList.innerHTML = keranjang.map((b,i)=>{
+    let sub=b.qty*b.harga; total+=sub;
+    return `<tr>
+      <td><strong>${b.nama}</strong><br>
+      Qty <input class="small-input" type="number" value="${b.qty}"
+        onchange="ubahQty(${i},this.value)">
+      </td>
+      <td class="right">Rp ${sub.toLocaleString()}
+      <button class="btn-danger" onclick="hapusItem(${i})">X</button>
+      </td>
+    </tr>`;
+  }).join("");
+
+  let pot = hitungDiskon(total);
+  totalSpan.textContent = "Rp " + (total-pot).toLocaleString();
 }
+
 function ubahQty(i,v){ keranjang[i].qty=Number(v); renderKeranjang(); }
-function ubahHarga(i,v){ keranjang[i].harga=Number(v); renderKeranjang(); }
-function hapusItem(i){ if(confirm("Hapus item?")){ keranjang.splice(i,1); renderKeranjang(); } }
+function hapusItem(i){
+  if(confirm("Hapus item?")){
+    keranjang.splice(i,1);
+    renderKeranjang();
+  }
+}
+
 diskon.oninput = diskonTipe.onchange = renderKeranjang;
-function hitungDiskon(t){ let d=Number(diskon.value||0); return diskonTipe.value==="persen"?t*d/100:d; }
+
+function hitungDiskon(t){
+  let d=Number(diskon.value||0);
+  return diskonTipe.value==="persen" ? t*d/100 : d;
+}
+
 function cetakStruk(){
-let s=keranjang.reduce((a,b)=>a+b.qty*b.harga,0);
-let p=hitungDiskon(s);
-localStorage.setItem("strukData",JSON.stringify({items:keranjang,subtotal:s,diskon:p,total:s-p}));
-location.href="struk.html";
+  localStorage.setItem("strukData", JSON.stringify(keranjang));
+  alert("Struk disimpan");
 }
+
 function kirimWA(){
-if(!keranjang.length) return alert("Keranjang kosong");
-let t="",total=0;
-keranjang.forEach(b=>{let s=b.qty*b.harga; total+=s; t+=`${b.qty}x ${b.nama} = Rp ${s.toLocaleString()}\n`;});
-let p=hitungDiskon(total);
-t+=`\nSubtotal : Rp ${total.toLocaleString()}\nDiskon : Rp ${p.toLocaleString()}\nTOTAL : Rp ${(total-p).toLocaleString()}`;
-open(`https://wa.me/?text=${encodeURIComponent(t)}`);
+  if(!keranjang.length) return alert("Keranjang kosong");
+  let t="",total=0;
+  keranjang.forEach(b=>{
+    let s=b.qty*b.harga; total+=s;
+    t+=`${b.qty}x ${b.nama} = Rp ${s.toLocaleString()}\n`;
+  });
+  open(`https://wa.me/?text=${encodeURIComponent(t)}`);
 }
-if("serviceWorker" in navigator){ navigator.serviceWorker.register("sw.js"); }
 </script>
 
 </body>
