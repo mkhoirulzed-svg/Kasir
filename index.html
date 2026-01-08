@@ -230,18 +230,20 @@ td { padding:6px 0; }
 <!-- ===== SCRIPT ASLI (TIDAK DIUBAH) ===== -->
 <script src="excel.js"></script>
 <script>
-/* === SEMUA SCRIPT KASIR ASLI KAMU UTUH === */
+/* === SEMUA SCRIPT KASIR ASLI (DIPERTAHANKAN) === */
+
 let database = [];
 let keranjang = [];
-    let database = [];
-let keranjang = [];
 
-// 🔗 API Spreadsheet (BARU)
-const API_BARANG = "https://script.google.com/macros/s/AKfycbz3XTARB3Vd1pANXA5MZ1KqbquHLRC4eO3K6uZENRxfjtvnE1Nb7gv0AHEkxqDxyejGtA/exec";
+/* 🔗 API Spreadsheet (WAJIB pakai action) */
+const API_BARANG =
+  "https://script.google.com/macros/s/AKfycbz3XTARB3Vd1pANXA5MZ1KqbquHLRC4eO3K6uZENRxfjtvnE1Nb7gv0AHEkxqDxyejGtA/exec?action=barang_kasir";
 
+/* ===== LOAD DATA BARANG ===== */
 fetch(API_BARANG)
   .then(res => res.json())
   .then(data => {
+    console.log("DATA BARANG:", data); // debug
     database = data;
     renderSelect();
   })
@@ -250,6 +252,7 @@ fetch(API_BARANG)
     console.error(err);
   });
 
+/* ===== RENDER SELECT (ASLI) ===== */
 function renderSelect(){
   listBarang.innerHTML = database.map(b =>
     `<option value="${b.nama}" data-harga="${b.harga}">
@@ -257,63 +260,148 @@ function renderSelect(){
     </option>`
   ).join("");
 }
-function renderSelect(){ listBarang.innerHTML = database.map(b =>
-`<option value="${b.nama}" data-harga="${b.harga}">${b.nama} - Rp ${b.harga.toLocaleString()}</option>`).join(""); }
+
+/* ===== CARI BARANG (ASLI, TANPA KODE) ===== */
 function cariBarang(){
-let q = search.value.toLowerCase();
-listBarang.innerHTML = database.filter(b =>
-b.nama.toLowerCase().includes(q) ||
-(b.kode && b.kode.toString().includes(q))
-).map(b =>
-`<option value="${b.nama}" data-harga="${b.harga}">${b.nama} - Rp ${b.harga.toLocaleString()}</option>`).join("");
+  let q = search.value.toLowerCase();
+  listBarang.innerHTML = database.filter(b =>
+    b.nama.toLowerCase().includes(q)
+  ).map(b =>
+    `<option value="${b.nama}" data-harga="${b.harga}">
+      ${b.nama} - Rp ${b.harga.toLocaleString()}
+    </option>`
+  ).join("");
 }
+
+/* ===== TAMBAH KE KERANJANG (ASLI) ===== */
 function tambah(){
-let opt = listBarang.selectedOptions[0];
-keranjang.push({ nama: opt.value, harga: Number(opt.dataset.harga), qty: Number(qty.value) });
-renderKeranjang();
+  let opt = listBarang.selectedOptions[0];
+  if(!opt) return alert("Barang belum dipilih");
+
+  keranjang.push({
+    nama: opt.value,
+    harga: Number(opt.dataset.harga),
+    qty: Number(qty.value)
+  });
+  renderKeranjang();
 }
+
+/* ===== TAMBAH MANUAL (ASLI) ===== */
 function tambahManual(){
-if(!manualNama.value || !manualHarga.value) return alert("Lengkapi data barang manual");
-keranjang.push({ nama: manualNama.value, harga: Number(manualHarga.value), qty: Number(manualQty.value) });
-manualNama.value=""; manualHarga.value=""; manualQty.value=1; renderKeranjang();
+  if(!manualNama.value || !manualHarga.value)
+    return alert("Lengkapi data barang manual");
+
+  keranjang.push({
+    nama: manualNama.value,
+    harga: Number(manualHarga.value),
+    qty: Number(manualQty.value)
+  });
+
+  manualNama.value="";
+  manualHarga.value="";
+  manualQty.value=1;
+  renderKeranjang();
 }
+
+/* ===== TOGGLE MANUAL (ASLI) ===== */
 function toggleManual(){
-manualBox.style.display = manualBox.style.display==="block" ? "none" : "block";
+  manualBox.style.display =
+    manualBox.style.display==="block" ? "none" : "block";
 }
+
+/* ===== RENDER KERANJANG (ASLI UTUH) ===== */
 function renderKeranjang(){
-let total=0;
-keranjangList.innerHTML = keranjang.map((b,i)=>{
-let sub=b.qty*b.harga; total+=sub;
-return `<tr><td><strong>${b.nama}</strong><br>
-Qty <input class="small-input" type="number" value="${b.qty}" onchange="ubahQty(${i},this.value)">
-Harga <input class="small-input" type="number" value="${b.harga}" onchange="ubahHarga(${i},this.value)">
-<button class="btn-danger" onclick="hapusItem(${i})">X</button></td>
-<td class="right">Rp ${sub.toLocaleString()}</td></tr>`;
-}).join("");
-let pot=hitungDiskon(total);
-total.innerText="Rp "+(total-pot).toLocaleString();
+  let total=0;
+  keranjangList.innerHTML = keranjang.map((b,i)=>{
+    let sub=b.qty*b.harga;
+    total+=sub;
+    return `<tr>
+      <td>
+        <strong>${b.nama}</strong><br>
+        Qty <input class="small-input" type="number"
+          value="${b.qty}"
+          onchange="ubahQty(${i},this.value)">
+        Harga <input class="small-input" type="number"
+          value="${b.harga}"
+          onchange="ubahHarga(${i},this.value)">
+        <button class="btn-danger" onclick="hapusItem(${i})">X</button>
+      </td>
+      <td class="right">Rp ${sub.toLocaleString()}</td>
+    </tr>`;
+  }).join("");
+
+  let pot = hitungDiskon(total);
+  totalSpan.innerText =
+    "Rp " + (total - pot).toLocaleString();
 }
-function ubahQty(i,v){ keranjang[i].qty=Number(v); renderKeranjang(); }
-function ubahHarga(i,v){ keranjang[i].harga=Number(v); renderKeranjang(); }
-function hapusItem(i){ if(confirm("Hapus item?")){ keranjang.splice(i,1); renderKeranjang(); } }
+
+/* ===== EDIT ITEM (ASLI) ===== */
+function ubahQty(i,v){
+  keranjang[i].qty = Number(v);
+  renderKeranjang();
+}
+
+function ubahHarga(i,v){
+  keranjang[i].harga = Number(v);
+  renderKeranjang();
+}
+
+function hapusItem(i){
+  if(confirm("Hapus item?")){
+    keranjang.splice(i,1);
+    renderKeranjang();
+  }
+}
+
+/* ===== DISKON (ASLI) ===== */
 diskon.oninput = diskonTipe.onchange = renderKeranjang;
-function hitungDiskon(t){ let d=Number(diskon.value||0); return diskonTipe.value==="persen"?t*d/100:d; }
+
+function hitungDiskon(t){
+  let d = Number(diskon.value || 0);
+  return diskonTipe.value === "persen"
+    ? t * d / 100
+    : d;
+}
+
+/* ===== CETAK STRUK (ASLI) ===== */
 function cetakStruk(){
-let s=keranjang.reduce((a,b)=>a+b.qty*b.harga,0);
-let p=hitungDiskon(s);
-localStorage.setItem("strukData",JSON.stringify({items:keranjang,subtotal:s,diskon:p,total:s-p}));
-location.href="struk.html";
+  let s = keranjang.reduce((a,b)=>a+b.qty*b.harga,0);
+  let p = hitungDiskon(s);
+  localStorage.setItem("strukData", JSON.stringify({
+    items: keranjang,
+    subtotal: s,
+    diskon: p,
+    total: s - p
+  }));
+  location.href="struk.html";
 }
+
+/* ===== KIRIM WHATSAPP (ASLI) ===== */
 function kirimWA(){
-if(!keranjang.length) return alert("Keranjang kosong");
-let t="",total=0;
-keranjang.forEach(b=>{let s=b.qty*b.harga; total+=s; t+=`${b.qty}x ${b.nama} = Rp ${s.toLocaleString()}\n`;});
-let p=hitungDiskon(total);
-t+=`\nSubtotal : Rp ${total.toLocaleString()}\nDiskon : Rp ${p.toLocaleString()}\nTOTAL : Rp ${(total-p).toLocaleString()}`;
-open(`https://wa.me/?text=${encodeURIComponent(t)}`);
+  if(!keranjang.length)
+    return alert("Keranjang kosong");
+
+  let t="", total=0;
+  keranjang.forEach(b=>{
+    let s=b.qty*b.harga;
+    total+=s;
+    t+=`${b.qty}x ${b.nama} = Rp ${s.toLocaleString()}\n`;
+  });
+
+  let p = hitungDiskon(total);
+  t+=`\nSubtotal : Rp ${total.toLocaleString()}
+Diskon : Rp ${p.toLocaleString()}
+TOTAL : Rp ${(total-p).toLocaleString()}`;
+
+  open(`https://wa.me/?text=${encodeURIComponent(t)}`);
 }
-if("serviceWorker" in navigator){ navigator.serviceWorker.register("sw.js"); }
+
+/* ===== SERVICE WORKER (ASLI) ===== */
+if("serviceWorker" in navigator){
+  navigator.serviceWorker.register("sw.js");
+}
 </script>
+
 
 </body>
 </html>
