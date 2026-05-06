@@ -141,29 +141,33 @@ document.getElementById("total").innerText =
     function editStruk() {
     window.location.href = "index.html";
 }
-   function saveStruk() {
+function saveStruk() {
     let receipt = document.getElementById("strukArea");
+    let buttons = document.querySelector(".no-save");
 
-    // simpan style awal
+    // sembunyikan tombol
+    buttons.style.display = "none";
+
+    // ubah layout jadi full (biar gak sempit)
     let originalMaxWidth = receipt.style.maxWidth;
     let originalWidth = receipt.style.width;
     let originalMargin = receipt.style.margin;
 
-    // ubah jadi full layar (seperti tampilan screenshot)
     receipt.style.maxWidth = "100%";
     receipt.style.width = "100%";
-    receipt.style.margin = "0";
+    receipt.style.margin = "10px";
 
     html2canvas(document.body, {
         scale: 2,
         useCORS: true
     }).then(canvas => {
         let link = document.createElement("a");
-        link.download = "struk_full.png";
+        link.download = "struk.png";
         link.href = canvas.toDataURL();
         link.click();
 
-        // kembalikan ke semula
+        // balikin semua seperti semula
+        buttons.style.display = "block";
         receipt.style.maxWidth = originalMaxWidth;
         receipt.style.width = originalWidth;
         receipt.style.margin = originalMargin;
