@@ -141,17 +141,32 @@ document.getElementById("total").innerText =
     function editStruk() {
     window.location.href = "index.html";
 }
-    function saveStruk() {
+   function saveStruk() {
+    let receipt = document.getElementById("strukArea");
+
+    // simpan style awal
+    let originalMaxWidth = receipt.style.maxWidth;
+    let originalWidth = receipt.style.width;
+    let originalMargin = receipt.style.margin;
+
+    // ubah jadi full layar (seperti tampilan screenshot)
+    receipt.style.maxWidth = "100%";
+    receipt.style.width = "100%";
+    receipt.style.margin = "0";
+
     html2canvas(document.body, {
         scale: 2,
-        useCORS: true,
-        windowWidth: document.body.scrollWidth,
-        windowHeight: document.body.scrollHeight
+        useCORS: true
     }).then(canvas => {
         let link = document.createElement("a");
         link.download = "struk_full.png";
         link.href = canvas.toDataURL();
         link.click();
+
+        // kembalikan ke semula
+        receipt.style.maxWidth = originalMaxWidth;
+        receipt.style.width = originalWidth;
+        receipt.style.margin = originalMargin;
     });
 }
 </script>
