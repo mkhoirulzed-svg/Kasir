@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
+    <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Struk</title>
@@ -136,7 +137,24 @@ document.getElementById("diskon").innerText =
 
 document.getElementById("total").innerText =
     "Rp " + data.total.toLocaleString();
-</script>
 
+    function editStruk() {
+    window.location.href = "index.html";
+}
+    function saveStruk() {
+    let area = document.getElementById("strukArea");
+
+    html2canvas(area).then(canvas => {
+        let link = document.createElement("a");
+        link.download = "struk.png";
+        link.href = canvas.toDataURL();
+        link.click();
+    });
+}
+</script>
+<div class="center" style="margin-top:10px;">
+    <button onclick="editStruk()">Edit</button>
+    <button onclick="saveStruk()">Save</button>
+</div>
 </body>
 </html>
