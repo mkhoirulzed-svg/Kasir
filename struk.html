@@ -154,8 +154,8 @@ function saveStruk() {
     let originalMargin = receipt.style.margin;
 
     receipt.style.maxWidth = "100%";
-    receipt.style.width = "100%";
-    receipt.style.margin = "20px auto";
+  receipt.style.width = "calc(100% - 20px)";
+receipt.style.margin = "10px";
 
     html2canvas(document.body, {
         scale: 2,
