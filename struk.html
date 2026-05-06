@@ -142,24 +142,16 @@ document.getElementById("total").innerText =
     window.location.href = "index.html";
 }
     function saveStruk() {
-    let area = document.getElementById("strukArea");
-
-    // simpan ukuran asli
-    let originalWidth = area.style.width;
-
-    // ubah sementara jadi lebih lebar
-    area.style.width = "600px";
-
-    html2canvas(area, {
-        scale: 2
+    html2canvas(document.body, {
+        scale: 2,
+        useCORS: true,
+        windowWidth: document.body.scrollWidth,
+        windowHeight: document.body.scrollHeight
     }).then(canvas => {
         let link = document.createElement("a");
-        link.download = "struk.png";
+        link.download = "struk_full.png";
         link.href = canvas.toDataURL();
         link.click();
-
-        // balikin ke ukuran awal
-        area.style.width = originalWidth;
     });
 }
 </script>
